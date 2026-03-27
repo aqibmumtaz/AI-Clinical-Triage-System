@@ -1,0 +1,642 @@
+{
+  "version": "1.0",
+  "description": "Disease-Symptom-Vitals-Specialty clustering dataset for real-time triage dashboard. Maps symptoms and vitals to disease conditions grouped by hospital department/specialist.",
+  "clusters": [
+    {
+      "department": "General Medicine",
+      "doctor": "Dr. Ahmed Khan",
+      "room": "101",
+      "icon": "🩺",
+      "conditions": [
+        {
+          "name": "Common Cold / Influenza",
+          "icd": "J06.9",
+          "symptoms": ["fever", "cough", "runny nose", "body ache", "sore throat", "chills", "fatigue", "sneezing", "congestion"],
+          "vitals": {"temperature": "elevated", "fever": "present"},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Typhoid Fever",
+          "icd": "A01.0",
+          "symptoms": ["fever", "headache", "abdominal pain", "weakness", "loss of appetite", "constipation", "diarrhea"],
+          "vitals": {"temperature": "high", "fever": "present"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Dengue Fever",
+          "icd": "A97",
+          "symptoms": ["high fever", "severe headache", "body ache", "joint pain", "rash", "fatigue", "nausea", "bleeding"],
+          "vitals": {"temperature": "high", "fever": "present", "bp": "low"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Urinary Tract Infection",
+          "icd": "N39.0",
+          "symptoms": ["burning urination", "frequent urination", "fever", "lower abdominal pain", "cloudy urine"],
+          "vitals": {"temperature": "elevated", "fever": "possible"},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Diabetes Management",
+          "icd": "E11",
+          "symptoms": ["excessive thirst", "frequent urination", "fatigue", "blurred vision", "slow healing", "weight loss", "numbness"],
+          "vitals": {"sugar_level": "elevated"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Hypertension",
+          "icd": "I10",
+          "symptoms": ["headache", "dizziness", "blurred vision", "chest discomfort", "shortness of breath", "nosebleed"],
+          "vitals": {"bp": "high", "heart_rate": "elevated"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Malaria",
+          "icd": "B54",
+          "symptoms": ["high fever", "chills", "sweating", "headache", "body ache", "nausea", "vomiting", "fatigue"],
+          "vitals": {"temperature": "high", "fever": "present"},
+          "severity": ["moderate", "severe"]
+        }
+      ]
+    },
+    {
+      "department": "Cardiology",
+      "doctor": "Dr. Ali Raza",
+      "room": "302",
+      "icon": "❤️",
+      "conditions": [
+        {
+          "name": "Angina / Chest Pain",
+          "icd": "I20.9",
+          "symptoms": ["chest pain", "chest tightness", "shortness of breath", "pain radiating to arm", "sweating", "nausea"],
+          "vitals": {"bp": "variable", "heart_rate": "elevated"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Hypertensive Heart Disease",
+          "icd": "I11",
+          "symptoms": ["chest pain", "shortness of breath", "fatigue", "dizziness", "swelling in legs", "palpitations"],
+          "vitals": {"bp": "high", "heart_rate": "elevated"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Arrhythmia / Palpitations",
+          "icd": "I49.9",
+          "symptoms": ["palpitations", "irregular heartbeat", "dizziness", "fainting", "chest discomfort", "shortness of breath"],
+          "vitals": {"heart_rate": "irregular", "bp": "variable"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Heart Failure",
+          "icd": "I50.9",
+          "symptoms": ["shortness of breath", "fatigue", "swelling in legs", "rapid weight gain", "persistent cough", "chest pain"],
+          "vitals": {"bp": "variable", "heart_rate": "elevated"},
+          "severity": ["severe"]
+        }
+      ]
+    },
+    {
+      "department": "Gynecology & Obstetrics",
+      "doctor": "Dr. Fatima Zahra",
+      "room": "205",
+      "icon": "🤰",
+      "conditions": [
+        {
+          "name": "Pregnancy Care",
+          "icd": "Z34",
+          "symptoms": ["missed period", "nausea", "vomiting", "fatigue", "breast tenderness", "frequent urination"],
+          "vitals": {"bp": "monitor"},
+          "severity": ["mild"]
+        },
+        {
+          "name": "Menstrual Disorders",
+          "icd": "N92",
+          "symptoms": ["irregular periods", "heavy bleeding", "painful periods", "cramps", "lower back pain", "mood changes"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Pelvic Inflammatory Disease",
+          "icd": "N73.0",
+          "symptoms": ["lower abdominal pain", "fever", "abnormal discharge", "painful urination", "irregular bleeding"],
+          "vitals": {"temperature": "elevated", "fever": "possible"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Prenatal Complications",
+          "icd": "O26.9",
+          "symptoms": ["high blood pressure", "swelling", "severe headache", "blurred vision", "abdominal pain", "bleeding"],
+          "vitals": {"bp": "high"},
+          "severity": ["moderate", "severe"]
+        }
+      ]
+    },
+    {
+      "department": "Pediatrics",
+      "doctor": "Dr. Sarah Malik",
+      "room": "108",
+      "icon": "👶",
+      "conditions": [
+        {
+          "name": "Childhood Fever / Infection",
+          "icd": "R50.9",
+          "symptoms": ["fever", "cough", "runny nose", "irritability", "poor feeding", "vomiting", "diarrhea"],
+          "vitals": {"temperature": "elevated", "fever": "present"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Childhood Asthma",
+          "icd": "J45",
+          "symptoms": ["wheezing", "cough", "breathing difficulty", "chest tightness", "shortness of breath"],
+          "vitals": {},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Growth / Nutrition Issues",
+          "icd": "E46",
+          "symptoms": ["poor weight gain", "poor feeding", "fatigue", "delayed development", "weakness"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Vaccination / Well-child Visit",
+          "icd": "Z23",
+          "symptoms": ["vaccination", "checkup", "growth monitoring", "well child"],
+          "vitals": {},
+          "severity": ["mild"]
+        }
+      ]
+    },
+    {
+      "department": "Orthopedics",
+      "doctor": "Dr. Usman Tariq",
+      "room": "210",
+      "icon": "🦴",
+      "conditions": [
+        {
+          "name": "Fracture / Bone Injury",
+          "icd": "T14.2",
+          "symptoms": ["fracture", "bone pain", "swelling", "deformity", "inability to move", "bruising", "trauma"],
+          "vitals": {"mobility": "impaired"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Back Pain / Disc Disease",
+          "icd": "M54.5",
+          "symptoms": ["back pain", "lower back pain", "sciatica", "leg numbness", "difficulty walking", "stiffness"],
+          "vitals": {"mobility": "limited"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Arthritis / Joint Pain",
+          "icd": "M13.9",
+          "symptoms": ["joint pain", "joint swelling", "stiffness", "knee pain", "difficulty walking", "morning stiffness"],
+          "vitals": {"mobility": "limited"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Sports Injury",
+          "icd": "T14.9",
+          "symptoms": ["muscle pain", "sprain", "strain", "swelling", "bruising", "limited movement", "ligament tear"],
+          "vitals": {"mobility": "impaired"},
+          "severity": ["mild", "moderate"]
+        }
+      ]
+    },
+    {
+      "department": "Dermatology",
+      "doctor": "Dr. Ayesha Siddiqui",
+      "room": "115",
+      "icon": "🧴",
+      "conditions": [
+        {
+          "name": "Skin Allergy / Eczema",
+          "icd": "L30.9",
+          "symptoms": ["skin rash", "itching", "redness", "dry skin", "swelling", "hives", "allergic reaction"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Acne / Skin Infection",
+          "icd": "L70.0",
+          "symptoms": ["acne", "pimples", "skin infection", "boils", "abscess", "redness", "pain"],
+          "vitals": {"fever": "possible"},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Psoriasis",
+          "icd": "L40.9",
+          "symptoms": ["scaly patches", "dry skin", "itching", "silvery scales", "joint pain", "nail changes"],
+          "vitals": {},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Fungal Infection",
+          "icd": "B36.9",
+          "symptoms": ["ring-shaped rash", "itching", "redness", "scaling", "hair loss", "nail discoloration"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        }
+      ]
+    },
+    {
+      "department": "ENT",
+      "doctor": "Dr. Hassan Javed",
+      "room": "118",
+      "icon": "👂",
+      "conditions": [
+        {
+          "name": "Ear Infection / Otitis",
+          "icd": "H66.9",
+          "symptoms": ["ear pain", "hearing loss", "ear discharge", "fever", "dizziness", "ringing in ear"],
+          "vitals": {"temperature": "elevated", "fever": "possible"},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Sinusitis",
+          "icd": "J32.9",
+          "symptoms": ["nasal congestion", "facial pain", "headache", "runny nose", "postnasal drip", "fever", "sinus pressure"],
+          "vitals": {"temperature": "elevated", "fever": "possible"},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Tonsillitis / Sore Throat",
+          "icd": "J03.9",
+          "symptoms": ["sore throat", "difficulty swallowing", "fever", "swollen tonsils", "neck pain", "hoarseness"],
+          "vitals": {"temperature": "elevated", "fever": "present"},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Vertigo / Balance Disorders",
+          "icd": "H81.1",
+          "symptoms": ["vertigo", "dizziness", "balance problems", "nausea", "vomiting", "ringing in ear"],
+          "vitals": {"bp": "check"},
+          "severity": ["mild", "moderate", "severe"]
+        }
+      ]
+    },
+    {
+      "department": "Ophthalmology",
+      "doctor": "Dr. Nadia Hussain",
+      "room": "122",
+      "icon": "👁️",
+      "conditions": [
+        {
+          "name": "Eye Infection / Conjunctivitis",
+          "icd": "H10.9",
+          "symptoms": ["red eye", "eye discharge", "eye pain", "itchy eye", "watery eyes", "swollen eyelid"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Vision Problems",
+          "icd": "H53.9",
+          "symptoms": ["blurred vision", "difficulty seeing", "eye strain", "headache", "double vision", "spots in vision"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Glaucoma",
+          "icd": "H40.9",
+          "symptoms": ["eye pain", "blurred vision", "halos around lights", "headache", "nausea", "vision loss"],
+          "vitals": {},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Cataract",
+          "icd": "H25.9",
+          "symptoms": ["cloudy vision", "blurred vision", "difficulty seeing at night", "faded colors", "glare sensitivity"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        }
+      ]
+    },
+    {
+      "department": "Neurology",
+      "doctor": "Dr. Bilal Qureshi",
+      "room": "310",
+      "icon": "🧠",
+      "conditions": [
+        {
+          "name": "Migraine / Chronic Headache",
+          "icd": "G43.9",
+          "symptoms": ["severe headache", "migraine", "nausea", "sensitivity to light", "sensitivity to sound", "aura", "vomiting"],
+          "vitals": {"bp": "check"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Epilepsy / Seizures",
+          "icd": "G40.9",
+          "symptoms": ["seizure", "convulsion", "loss of consciousness", "confusion", "staring spells", "jerking movements"],
+          "vitals": {},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Stroke Symptoms",
+          "icd": "I64",
+          "symptoms": ["sudden weakness", "numbness", "difficulty speaking", "vision loss", "severe headache", "confusion", "dizziness"],
+          "vitals": {"bp": "high"},
+          "severity": ["severe"]
+        },
+        {
+          "name": "Nerve Pain / Neuropathy",
+          "icd": "G62.9",
+          "symptoms": ["numbness", "tingling", "burning sensation", "weakness", "nerve pain", "pins and needles"],
+          "vitals": {"sugar_level": "check"},
+          "severity": ["mild", "moderate", "severe"]
+        }
+      ]
+    },
+    {
+      "department": "Dentistry",
+      "doctor": "Dr. Zainab Akhtar",
+      "room": "G-05",
+      "icon": "🦷",
+      "conditions": [
+        {
+          "name": "Toothache / Dental Pain",
+          "icd": "K08.8",
+          "symptoms": ["toothache", "tooth pain", "dental pain", "swollen gums", "sensitivity to hot", "sensitivity to cold"],
+          "vitals": {},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Dental Abscess",
+          "icd": "K04.7",
+          "symptoms": ["severe tooth pain", "swollen face", "fever", "bad taste in mouth", "swollen gums", "difficulty opening mouth"],
+          "vitals": {"temperature": "elevated", "fever": "possible"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Gum Disease",
+          "icd": "K05.1",
+          "symptoms": ["bleeding gums", "swollen gums", "bad breath", "loose teeth", "gum pain", "receding gums"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        }
+      ]
+    },
+    {
+      "department": "Gastroenterology",
+      "doctor": "Dr. Imran Shah",
+      "room": "215",
+      "icon": "🫃",
+      "conditions": [
+        {
+          "name": "Gastritis / Acid Reflux",
+          "icd": "K29.7",
+          "symptoms": ["stomach pain", "heartburn", "acid reflux", "nausea", "bloating", "burping", "indigestion"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "IBS / Bowel Issues",
+          "icd": "K58.9",
+          "symptoms": ["abdominal pain", "bloating", "diarrhea", "constipation", "gas", "cramping", "irregular bowel"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "Hepatitis / Liver Disease",
+          "icd": "K75.9",
+          "symptoms": ["jaundice", "abdominal pain", "fatigue", "nausea", "dark urine", "loss of appetite", "itching"],
+          "vitals": {"fever": "possible"},
+          "severity": ["moderate", "severe"]
+        },
+        {
+          "name": "Stomach Ulcer",
+          "icd": "K25.9",
+          "symptoms": ["stomach pain", "burning sensation", "nausea", "vomiting", "bloating", "weight loss", "blood in stool"],
+          "vitals": {},
+          "severity": ["moderate", "severe"]
+        }
+      ]
+    },
+    {
+      "department": "Psychiatry",
+      "doctor": "Dr. Maryam Riaz",
+      "room": "320",
+      "icon": "🧘",
+      "conditions": [
+        {
+          "name": "Anxiety Disorder",
+          "icd": "F41.9",
+          "symptoms": ["anxiety", "nervousness", "restlessness", "palpitations", "excessive worry", "panic attacks", "trembling"],
+          "vitals": {"heart_rate": "elevated", "bp": "elevated"},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Depression",
+          "icd": "F32.9",
+          "symptoms": ["sadness", "depression", "loss of interest", "fatigue", "sleep problems", "appetite changes", "hopelessness"],
+          "vitals": {},
+          "severity": ["mild", "moderate", "severe"]
+        },
+        {
+          "name": "Insomnia / Sleep Disorders",
+          "icd": "G47.0",
+          "symptoms": ["insomnia", "difficulty sleeping", "sleep problems", "daytime sleepiness", "fatigue", "irritability"],
+          "vitals": {},
+          "severity": ["mild", "moderate"]
+        },
+        {
+          "name": "PTSD / Stress Disorder",
+          "icd": "F43.1",
+          "symptoms": ["flashbacks", "nightmares", "anxiety", "stress", "avoidance", "emotional numbness", "irritability"],
+          "vitals": {},
+          "severity": ["moderate", "severe"]
+        }
+      ]
+    }
+  ],
+  "symptom_aliases": {
+    "chest pain": ["seene mein dard", "سینے میں درد", "chhati mein dard", "dard-e-seena", "سینے کی تکلیف", "seene mein takleef"],
+    "chest tightness": ["seene mein jakran", "سینے میں جکڑن", "سینہ تنگ"],
+    "chest discomfort": ["seene mein beaaram", "سینے میں بے آرامی"],
+    "fever": ["bukhar", "بخار", "tap", "تپ", "بھکار", "بکھار", "بُخار", "تیز بخار", "halka bukhar", "ہلکا بخار"],
+    "headache": ["sir dard", "سر درد", "sir mein dard", "سردرد", "سر میں درد", "آدھے سر کا درد"],
+    "cough": ["khansi", "کھانسی", "خاصی", "حاصل", "کانسی", "khaansi", "خشک کھانسی", "بلغمی کھانسی", "کاشی", "کھاسی", "کاسی", "خانسی", "کاشے"],
+    "stomach pain": ["pait dard", "پیٹ درد", "pait mein dard", "abdominal pain", "پیٹ میں درد", "pait ke nichle hisse mein dard"],
+    "back pain": ["kamar dard", "کمر درد", "کمر میں درد", "peeth dard", "پیٹھ درد"],
+    "joint pain": ["joron ka dard", "جوڑوں کا درد", "joint swelling", "joron mein sujan", "جوڑوں میں سوجن", "knee pain", "گھٹنے کا درد", "ghutne ka dard"],
+    "sore throat": ["gala kharab", "گلا خراب", "gale mein dard", "گلے میں درد", "gale mein takleef", "گلے میں تکلیف"],
+    "dizziness": ["chakkar", "چکر", "sar ghoomna", "سر گھومنا", "vertigo", "chakkar aana", "چکر آنا"],
+    "vomiting": ["ulti", "الٹی", "qay", "قے", "ulti aana", "الٹی آنا"],
+    "diarrhea": ["dast", "دست", "loose motion", "پتلے دست", "patle dast", "بار بار دست"],
+    "breathing difficulty": ["saans lene mein takleef", "سانس لینے میں تکلیف", "shortness of breath", "سانس پھولنا", "saans phoolna", "dam ghutna", "دم گھٹنا", "سانس تنگ"],
+    "wheezing": ["saans mein awaaz", "سانس میں آواز", "seen seen", "سیں سیں"],
+    "toothache": ["daant mein dard", "دانت میں درد", "tooth pain", "dental pain", "daant dard", "دانت کا درد", "severe tooth pain"],
+    "ear pain": ["kaan mein dard", "کان میں درد", "kaan dard", "کان درد", "کان کی تکلیف"],
+    "eye pain": ["aankh mein dard", "آنکھ میں درد", "aankh dard", "آنکھ درد", "آنکھ کی تکلیف"],
+    "skin rash": ["khaarish", "خارش", "daane", "دانے", "jild par daane", "جلد پر دانے", "rash", "چھپاکی", "hives"],
+    "numbness": ["sun hona", "سن ہونا", "tingling", "جھنجھناہٹ", "jhunjhunahat", "pins and needles", "سنسناہٹ"],
+    "anxiety": ["ghabrahat", "گھبراہٹ", "bechain", "بے چینی", "restlessness", "nervousness", "panic attacks", "ghabrana", "گھبرانا"],
+    "depression": ["udaasi", "اداسی", "sadness", "udas", "اداس", "loss of interest", "دلچسپی کا نقصان", "hopelessness", "مایوسی"],
+    "insomnia": ["neend na aana", "نیند نہ آنا", "نیند نہیں آتی", "neend nahi aati", "sleep problems", "difficulty sleeping", "نیند نہ آنے کی بیماری", "neend ki kami", "نیند کی کمی"],
+    "burning urination": ["peshab mein jalan", "پیشاب میں جلن", "painful urination", "پیشاب میں تکلیف", "peshab mein takleef"],
+    "bleeding": ["khoon behna", "خون بہنا", "khoon aana", "خون آنا", "heavy bleeding", "بہت زیادہ خون"],
+    "swelling": ["sujan", "سوجن", "phulna", "پھولنا", "swollen", "سوجا ہوا"],
+    "weakness": ["kamzori", "کمزوری", "بے حسی"],
+    "nausea": ["متلی", "ji machlana", "جی متلانا", "ji machalna", "tabiyat kharab"],
+    "body ache": ["badan dard", "بدن درد", "jism mein dard", "جسم میں درد", "badan tootna", "بدن ٹوٹنا"],
+    "chills": ["khanpna", "کانپنا", "thand lagna", "ٹھنڈ لگنا", "رعشہ"],
+    "runny nose": ["naak behna", "ناک بہنا", "naak se paani", "ناک سے پانی", "nazla", "نزلہ"],
+    "sneezing": ["cheenkein", "چھینکیں", "cheenk aana", "چھینک آنا"],
+    "congestion": ["naak band", "ناک بند", "ناک بند ہونا"],
+    "constipation": ["qabz", "قبض", "pait saaf na hona", "پیٹ صاف نہ ہونا"],
+    "fatigue": ["thakan", "تھکاوٹ", "thakawat", "تھکاوٹ محسوس ہونا"],
+    "loss of appetite": ["bhook na lagna", "بھوک نہ لگنا", "khaana na khana", "کھانا نہ کھانا"],
+    "weight loss": ["wazan kam hona", "وزن کم ہونا", "wazan girna", "وزن گرنا"],
+    "blurred vision": ["dhundla dikhna", "دھندلا دکھنا", "nazar kamzor", "نظر کمزور", "cloudy vision", "difficulty seeing"],
+    "palpitations": ["dil ki dharkan tez", "دل کی دھڑکن تیز", "dil zor se dharkna", "دل زور سے دھڑکنا", "irregular heartbeat"],
+    "sweating": ["pasina aana", "پسینہ آنا", "bohat pasina", "بہت پسینہ"],
+    "high blood pressure": ["blood pressure", "بلڈ پریشر", "BP zyada", "بی پی زیادہ", "فشار خون"],
+    "frequent urination": ["baar baar peshab", "بار بار پیشاب", "peshab zyada aana", "پیشاب زیادہ آنا"],
+    "excessive thirst": ["bohat pyaas", "بہت پیاس", "pyaas zyada lagna", "پیاس زیادہ لگنا"],
+    "slow healing": ["zakhm na bharna", "زخم نہ بھرنا", "deri se thik hona", "دیر سے ٹھیک ہونا"],
+    "nosebleed": ["naak se khoon", "ناک سے خون", "naak behna khoon", "ناک بہنا خون"],
+    "pain radiating to arm": ["bazu mein dard", "بازو میں درد", "haath mein dard", "ہاتھ میں درد"],
+    "swelling in legs": ["tangon mein sujan", "ٹانگوں میں سوجن", "pairon mein sujan", "پیروں میں سوجن"],
+    "fainting": ["behosh hona", "بے ہوش ہونا", "ghash aana", "غش آنا"],
+    "missed period": ["mahwari na aana", "ماہواری نہ آنا", "period miss", "پیریڈ مس"],
+    "breast tenderness": ["چھاتی میں درد", "chhati mein takleef", "چھاتی میں سوجن", "breast pain"],
+    "irregular periods": ["mahwari mein gadbad", "ماہواری میں گڑبڑ", "بے قاعدہ ماہواری", "irregular mahwari"],
+    "heavy bleeding": ["zyada khoon", "زیادہ خون", "bohat zyada bleeding"],
+    "painful periods": ["dard wali mahwari", "درد والی ماہواری", "mahwari mein dard", "ماہواری میں درد"],
+    "cramps": ["maror", "مروڑ", "ainthna", "اینٹھنا", "ainthan", "اینٹھن"],
+    "abnormal discharge": ["ghair mamuli discharge", "غیر معمولی خارج"],
+    "fracture": ["haddi tootna", "ہڈی ٹوٹنا", "haddi toot gai", "ہڈی ٹوٹ گئی", "فریکچر", "fracture hua", "ہڈی ٹوٹی"],
+    "bone pain": ["haddi mein dard", "ہڈی میں درد", "haddi dard", "ہڈی درد", "ہڈیاں میں درد", "ہڈیوں میں درد", "haddiyon mein dard"],
+    "inability to move": ["hil na sakna", "ہل نہ سکنا", "harkat na kar sakna", "حرکت نہ کر سکنا"],
+    "bruising": ["neela nishan", "نیلا نشان", "chot ka nishan", "چوٹ کا نشان"],
+    "trauma": ["chot", "چوٹ", "sadma", "صدمہ"],
+    "sciatica": ["kamar se tang tak dard", "کمر سے ٹانگ تک درد"],
+    "leg numbness": ["tang mein sun", "ٹانگ میں سن", "pair sun hona", "پیر سن ہونا"],
+    "difficulty walking": ["chalne mein takleef", "چلنے میں تکلیف", "chal na sakna"],
+    "stiffness": ["akarna", "اکڑنا", "اکڑاہٹ", "morning stiffness"],
+    "muscle pain": ["muscle dard", "مسل درد", "patthon mein dard", "پٹھوں میں درد"],
+    "sprain": ["moch", "موچ", "moch aana", "موچ آنا"],
+    "ligament tear": ["ligament ka masla", "لیگامنٹ کا مسئلہ"],
+    "itching": ["kharish", "خارش", "khujli", "کھجلی"],
+    "redness": ["surkhi", "سرخی", "laal hona", "لال ہونا"],
+    "acne": ["muhase", "مہاسے", "daane", "دانے", "pimples"],
+    "boils": ["phoray", "پھوڑے", "phoora", "پھوڑا"],
+    "dry skin": ["khushk jild", "خشک جلد", "jild ka khushk hona"],
+    "hair loss": ["baal girna", "بال گرنا", "baalon ka jharna", "بالوں کا جھڑنا"],
+    "nail discoloration": ["nakhun ka rang badalna", "ناخن کا رنگ بدلنا"],
+    "hearing loss": ["sunai na dena", "سنائی نہ دینا", "kam sunai dena", "کم سنائی دینا"],
+    "ear discharge": ["kaan se paani", "کان سے پانی", "kaan behna", "کان بہنا"],
+    "ringing in ear": ["kaan mein awaaz", "کان میں آواز", "kaan bajna", "کان بجنا"],
+    "nasal congestion": ["naak band", "ناک بند", "naak band hona", "ناک بند ہونا"],
+    "facial pain": ["chehre mein dard", "چہرے میں درد"],
+    "difficulty swallowing": ["nighalne mein takleef", "نگلنے میں تکلیف", "kuch nighalne mein mushkil"],
+    "swollen tonsils": ["tonsil sujna", "ٹانسل سوجنا", "gale ki sujan"],
+    "hoarseness": ["awaaz baithi", "آواز بیٹھی", "awaaz kharab", "آواز خراب"],
+    "balance problems": ["tawazun ki mushkil", "توازن کی مشکل"],
+    "red eye": ["aankh laal", "آنکھ لال", "aankh mein lali"],
+    "eye discharge": ["aankh se paani", "آنکھ سے پانی"],
+    "itchy eye": ["aankh mein kharish", "آنکھ میں خارش"],
+    "watery eyes": ["aankhen bhari", "آنکھیں بھری", "aankh se paani aana"],
+    "swollen eyelid": ["palak sujna", "پلک سوجنا"],
+    "vision loss": ["nazar chali gai", "نظر چلی گئی", "dikhna band"],
+    "double vision": ["do dikhna", "دو دکھنا"],
+    "sensitivity to light": ["roshni se takleef", "روشنی سے تکلیف", "roshni bardasht na hona"],
+    "seizure": ["mirgi ka dora", "مرگی کا دورہ", "jhatkay", "جھٹکے", "convulsion"],
+    "loss of consciousness": ["hosh kho dena", "ہوش کھو دینا", "behoshi", "بے ہوشی"],
+    "confusion": ["confuse hona", "کنفیوز ہونا", "zihn mein khalal"],
+    "sudden weakness": ["achanak kamzori", "اچانک کمزوری"],
+    "difficulty speaking": ["bolne mein mushkil", "بولنے میں مشکل", "zuban ladhkhana"],
+    "nerve pain": ["naas ka dard", "ناس کا درد", "nerve dard"],
+    "burning sensation": ["jalan", "جلن", "jalan hona", "جلن ہونا"],
+    "swollen gums": ["masoorhon mein sujan", "مسوڑھوں میں سوجن", "masoorhe sujna"],
+    "bleeding gums": ["masoorhon se khoon", "مسوڑھوں سے خون"],
+    "bad breath": ["munh ki badboo", "منہ کی بدبو"],
+    "loose teeth": ["daant hilna", "دانت ہلنا"],
+    "swollen face": ["chehra sujna", "چہرا سوجنا", "munh sujna", "منہ سوجنا"],
+    "difficulty opening mouth": ["munh kholne mein mushkil", "منہ کھولنے میں مشکل"],
+    "heartburn": ["seene mein jalan", "سینے میں جلن", "acidity", "تیزابیت"],
+    "acid reflux": ["tezaab ka upar aana", "تیزاب کا اوپر آنا", "acidity"],
+    "bloating": ["pait phoola hua", "پیٹ پھولا ہوا", "pait mein gas", "پیٹ میں گیس"],
+    "gas": ["gas", "گیس", "pait ki gas", "پیٹ کی گیس"],
+    "indigestion": ["badhazmi", "بدہضمی", "hazma kharab"],
+    "jaundice": ["yarqaan", "یرقان", "peeliya", "پیلیا"],
+    "dark urine": ["peela peshab", "پیلا پیشاب", "gehra peshab"],
+    "blood in stool": ["pakhane mein khoon", "پاخانے میں خون"],
+    "irritability": ["chirhchirha pan", "چڑچڑا پن", "chirhna"],
+    "mood changes": ["mizaj mein tabdeeli", "مزاج میں تبدیلی"],
+    "sleep problems": ["neend ka masla", "نیند کا مسئلہ", "neend ki pareshani"],
+    "appetite changes": ["bhook mein tabdeeli", "بھوک میں تبدیلی"],
+    "stress": ["tension", "ٹینشن", "zehni dabao", "ذہنی دباؤ"],
+    "nightmares": ["bure khwab", "برے خواب"],
+    "flashbacks": ["purani yaadein", "پرانی یادیں"],
+    "trembling": ["haath kaanpna", "ہاتھ کانپنا", "لرزنا", "لرزش", "jism kaanpna"],
+    "rapid weight gain": ["tezi se wazan barhna", "تیزی سے وزن بڑھنا"],
+    "cloudy urine": ["dhundla peshab", "دھندلا پیشاب"],
+    "neck pain": ["gardan mein dard", "گردن میں درد", "gardan dard"],
+    "lower back pain": ["kamar ke niche dard", "کمر کے نیچے درد"],
+    "lower abdominal pain": ["پیٹ کے نچلے حصے میں درد", "pait ke nichle hisse mein dard"],
+    "high fever": ["تیز بخار", "shadeed bukhar", "شدید بخار"],
+    "severe headache": ["شدید سر درد", "tez sir dard"],
+    "persistent cough": ["مسلسل کھانسی", "lambi khansi", "لمبی کھانسی"],
+    "migraine": ["آدھے سر کا درد", "آدھا سیسی", "adha sisi"],
+    "poor feeding": ["بچے کا دودھ نہ پینا", "کم خوراک"],
+    "poor weight gain": ["وزن نہ بڑھنا", "کم وزن"],
+    "delayed development": ["نشوونما میں تاخیر", "بچے کی نشوونما دیر سے"],
+    "abscess": ["پھوڑا", "phora"],
+    "allergic reaction": ["الرجی", "الرجک ردعمل"],
+    "aura": ["آنکھوں کے سامنے چمک", "بصری خلل"],
+    "avoidance": ["کسی چیز سے بچنا", "اجتناب"],
+    "bad taste in mouth": ["منہ کا ذائقہ خراب", "منہ میں بدمزہ"],
+    "burping": ["ڈکار", "dakaar"],
+    "checkup": ["معائنہ", "چیک اپ"],
+    "cramping": ["مروڑ", "اینٹھن", "maror"],
+    "daytime sleepiness": ["دن میں نیند آنا", "din mein neend"],
+    "emotional numbness": ["جذباتی بے حسی", "جذبات کا نہ ہونا"],
+    "excessive worry": ["زیادہ فکر", "بہت پریشانی"],
+    "eye strain": ["آنکھوں کی تھکاوٹ", "آنکھوں میں تناؤ"],
+    "faded colors": ["رنگ پھیکے نظر آنا", "رنگوں میں فرق"],
+    "glare sensitivity": ["تیز روشنی سے تکلیف", "چمک سے پریشانی"],
+    "growth monitoring": ["بچے کی نشوونما کا جائزہ", "قد و وزن کی پیمائش"],
+    "gum pain": ["مسوڑھوں میں درد", "masoorhon mein dard"],
+    "halos around lights": ["روشنی کے گرد حلقے", "روشنی میں دھندلاہٹ"],
+    "irregular bleeding": ["بے قاعدہ خون آنا", "بے ترتیب خون"],
+    "irregular bowel": ["پیٹ کی بے قاعدگی", "بے ترتیب پاخانہ"],
+    "jerking movements": ["جھٹکے آنا", "اچانک حرکت"],
+    "limited movement": ["حرکت میں مشکل", "محدود حرکت"],
+    "nail changes": ["ناخنوں میں تبدیلی", "ناخن خراب"],
+    "pain": ["درد", "dard"],
+    "postnasal drip": ["ناک کا بلغم حلق میں آنا", "ناک سے پیچھے بہنا"],
+    "receding gums": ["مسوڑھوں کا پیچھے ہٹنا", "مسوڑھوں کی کمی"],
+    "ring-shaped rash": ["گول دانے", "حلقے نما دانے"],
+    "scaling": ["جلد کا چھلنا", "کھلی جلد"],
+    "scaly patches": ["کھردرے دھبے", "خشک دھبے"],
+    "sensitivity to cold": ["ٹھنڈا لگنا", "ٹھنڈے سے تکلیف"],
+    "sensitivity to hot": ["گرم سے تکلیف", "گرم لگنا"],
+    "sensitivity to sound": ["آواز سے تکلیف", "شور سے پریشانی"],
+    "silvery scales": ["چاندی جیسے چھلکے", "سفید چھلکے"],
+    "sinus pressure": ["سائنس کا دباؤ", "ناک میں دباؤ"],
+    "skin infection": ["جلد کا انفیکشن", "جلد میں سوجن"],
+    "spots in vision": ["نظر میں دھبے", "آنکھوں میں دھبے"],
+    "staring spells": ["ایک جگہ تکنا", "گھورتے رہنا"],
+    "strain": ["موچ", "کھنچاؤ", "moch"],
+    "vaccination": ["ٹیکہ", "ویکسین", "teeka"],
+    "well child": ["صحت مند بچے کا معائنہ", "بچے کا چیک اپ"],
+    "deformity": ["ٹیڑھاپن", "بگاڑ", "ہڈی کا ٹیڑھا ہونا"],
+    "difficulty seeing at night": ["رات کو نظر نہ آنا", "اندھیرے میں نظر کمزور"]
+  },
+  "referral_rules": {
+    "General Medicine": "DEFAULT for adults with common symptoms (fever, cough, cold, body ache, weakness, headache). If unsure, refer here.",
+    "Cardiology": "ONLY when chest pain, palpitations, or heart-related symptoms are the PRIMARY complaint. Not for general chest discomfort.",
+    "Gynecology & Obstetrics": "ONLY for female patients with pregnancy, menstrual, or pelvic symptoms.",
+    "Pediatrics": "ONLY for children (under 12 years). For adults with same symptoms, use General Medicine or relevant specialty.",
+    "Orthopedics": "For bone injuries, fractures, joint pain, back pain, sports injuries. Not for general body ache.",
+    "Dermatology": "ONLY when skin is the PRIMARY issue (rash, itching, acne, skin infection). Not for fever with rash (use General Medicine).",
+    "ENT": "For ear, nose, throat-specific issues (ear pain, sinusitis, tonsils, vertigo). Simple sore throat with fever goes to General Medicine.",
+    "Ophthalmology": "ONLY for eye-specific complaints (eye pain, vision problems, redness).",
+    "Neurology": "For persistent/severe headache, seizures, stroke symptoms, numbness/nerve pain. Simple headache goes to General Medicine.",
+    "Dentistry": "ONLY for dental/tooth/gum issues.",
+    "Gastroenterology": "For persistent stomach/digestive issues (acid reflux, IBS, liver problems). Simple stomach ache goes to General Medicine.",
+    "Psychiatry": "For mental health (anxiety, depression, insomnia, stress). Not for physical symptoms.",
+    "_default": "When in DOUBT, refer to General Medicine."
+  }
+}

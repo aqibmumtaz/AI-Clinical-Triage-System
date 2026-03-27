@@ -1,0 +1,13 @@
+{
+  "agent_name": "Hira",
+  "voice_gender": "F",
+  "personality": "warm",
+  "lang_style": "formal",
+  "llm_model": "gpt-4o-mini",
+  "stt_model": "Deepgram Nova-3",
+  "stt_language": "en",
+  "tts_provider": "OpenAI",
+  "tts_model": "tts-1",
+  "tts_voice": "nova",
+  "conversation_log": []
+}

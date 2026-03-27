@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Clinical Triage System — {{HOSPITAL_NAME}}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #f0f4f8; --surface: #ffffff; --surface-2: #f8fafc;
+    --primary: #0e7490; --primary-dark: #155e75; --primary-light: #06b6d4;
+    --accent: #0d9488; --accent-light: #14b8a6;
+    --danger: #dc2626; --danger-light: #fecaca;
+    --success: #059669; --success-light: #d1fae5;
+    --warning: #d97706; --warning-light: #fef3c7;
+    --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+    --border: #e2e8f0; --border-light: #f1f5f9;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+    --radius: 12px; --radius-lg: 16px; --radius-xl: 20px;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.header {
+    background: linear-gradient(135deg, #0e7490 0%, #0d9488 40%, #059669 100%);
+    color: white; padding: 20px 32px; display: flex; align-items: center;
+    justify-content: space-between; box-shadow: 0 4px 20px rgba(14,116,144,0.25);
+    position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-icon {
+    width: 48px; height: 48px; background: rgba(255,255,255,0.15);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; backdrop-filter: blur(8px);
+}
+.header-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.header-subtitle { font-size: 13px; opacity: 0.85; font-weight: 400; margin-top: 2px; }
+.header-badges { display: flex; gap: 8px; }
+.header-badge {
+    padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    background: rgba(255,255,255,0.18); backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ── Layout ── */
+.main { display: flex; gap: 20px; padding: 20px 24px; max-width: 1600px; margin: 0 auto; height: calc(100vh - 90px); }
+.col-left { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.col-right { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 380px; max-width: 560px; }
+
+/* ── Cards ── */
+.card {
+    background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+    border: 1px solid var(--border); overflow: hidden;
+}
+.card-header {
+    padding: 14px 20px; border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface-2);
+}
+.card-header h3 { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.card-body { padding: 16px 20px; }
+
+/* ── Controls ── */
+.controls { display: flex; gap: 10px; align-items: center; }
+.btn {
+    padding: 10px 24px; border: none; border-radius: 10px; font-size: 14px;
+    font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s ease; font-family: inherit;
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white; box-shadow: 0 2px 8px rgba(14,116,144,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14,116,144,0.4); }
+.btn-primary:active { transform: translateY(0); }
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white; box-shadow: 0 2px 8px rgba(220,38,38,0.25);
+}
+.btn-danger:hover { transform: translateY(-1px); }
+
+/* ── Status ── */
+.status-bar {
+    display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+.status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.status-dot.ready { background: var(--text-muted); }
+.status-dot.connecting { background: var(--warning); animation: pulse 1.5s infinite; }
+.status-dot.listening { background: var(--success); animation: pulse 2s infinite; }
+.status-dot.thinking { background: var(--primary-light); animation: pulse 1s infinite; }
+.status-dot.speaking { background: #8b5cf6; animation: pulse 1.2s infinite; }
+.status-dot.ended { background: var(--danger); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.status-text { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.mic-meter {
+    flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.mic-meter-fill {
+    height: 100%; background: linear-gradient(90deg, var(--success), var(--primary-light));
+    border-radius: 3px; transition: width 0.15s ease; width: 0%;
+}
+
+/* ── STT Live ── */
+.stt-live {
+    padding: 14px 20px; background: linear-gradient(135deg, #ecfeff, #f0fdfa);
+    border-radius: var(--radius); border: 1.5px solid var(--primary-light);
+    min-height: 48px; font-size: 16px; line-height: 1.8;
+    color: var(--primary-dark); position: relative;
+    transition: direction 0.2s;
+}
+.stt-live.rtl { direction: rtl; text-align: right; font-family: 'Noto Nastaliq Urdu', serif; }
+.stt-live.ltr { direction: ltr; text-align: left; font-family: 'Inter', sans-serif; }
+.stt-live::before {
+    content: ''; position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: var(--primary-light);
+    animation: pulse 1.5s infinite;
+}
+.stt-live.empty { color: var(--text-muted); font-style: italic; direction: ltr; text-align: left; font-family: 'Inter', sans-serif; font-size: 13px; padding-left: 32px; }
+
+/* ── Conversation ── */
+.conversation {
+    flex: 1; overflow-y: auto; padding: 16px 20px; display: flex;
+    flex-direction: column; gap: 12px; scroll-behavior: smooth;
+}
+.msg {
+    display: flex; gap: 10px; animation: msgIn 0.3s ease;
+    max-width: 88%;
+}
+.msg.patient { align-self: flex-end; flex-direction: row-reverse; }
+.msg.medi { align-self: flex-start; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.msg-avatar {
+    width: 36px; height: 36px; border-radius: 10px; display: flex;
+    align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.msg.patient .msg-avatar { background: linear-gradient(135deg, #e0f2fe, #bae6fd); }
+.msg.medi .msg-avatar { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+
+.msg-bubble {
+    padding: 12px 16px; border-radius: 14px; font-size: 15px; line-height: 1.7;
+}
+.conversation.rtl .msg-bubble { direction: rtl; text-align: right; font-family: 'Noto Nastaliq Urdu', serif; }
+.conversation.ltr .msg-bubble { direction: ltr; text-align: left; font-family: inherit; }
+.msg.patient .msg-bubble {
+    background: linear-gradient(135deg, #0e7490, #0d9488); color: white;
+    border-bottom-right-radius: 4px;
+}
+.msg.medi .msg-bubble {
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-bottom-left-radius: 4px;
+}
+
+.msg-time {
+    font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: right;
+}
+.msg.medi .msg-time { text-align: left; }
+
+.conversation-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex: 1; color: var(--text-muted); text-align: center; gap: 12px; padding: 40px;
+}
+.conversation-empty .icon { font-size: 48px; opacity: 0.4; }
+.conversation-empty p { font-size: 14px; line-height: 1.6; max-width: 300px; }
+
+/* ── Right Column Tabs ── */
+.right-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 12px; gap: 4px; }
+.right-tab {
+    padding: 8px 18px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all 0.2s ease; border-radius: 8px 8px 0 0; background: none; border-top: none; border-left: none; border-right: none;
+}
+.right-tab:hover { color: var(--text); background: var(--surface-2); }
+.right-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--surface); }
+.tab-panel { display: none; flex-direction: column; flex: 1; min-height: 0; gap: 12px; }
+.tab-panel.active { display: flex; }
+
+/* ── Agent Profile Summary ── */
+.agent-summary {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    background: linear-gradient(135deg, var(--surface-2), #f0fdf4); border-radius: 10px;
+    border: 1px solid var(--border-light); margin-bottom: 12px;
+}
+.agent-avatar {
+    width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 22px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white; font-weight: 700;
+}
+.agent-summary-info { flex: 1; min-width: 0; }
+.agent-summary-name { font-weight: 700; font-size: 15px; color: var(--text); }
+.agent-summary-details { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.5; }
+.agent-summary-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px;
+    font-weight: 600; background: var(--primary-light); color: white; margin-right: 4px; margin-top: 4px;
+}
+.agent-summary-tag.gender { background: #8b5cf6; }
+.agent-summary-tag.lang { background: var(--accent); }
+.agent-summary-tag.style { background: var(--warning); }
+.model-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.model-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px;
+    font-weight: 600; color: white;
+}
+.model-tag.stt { background: #0ea5e9; }
+.model-tag.llm { background: #8b5cf6; }
+.model-tag.tts { background: #f59e0b; }
+#tab-settings.active { display: flex; flex-direction: column; gap: 8px; }
+.config-section { border-bottom: 1px solid var(--border-light); }
+.config-section:last-child { border-bottom: none; }
+.config-section-header {
+    padding: 14px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    font-size: 14px; font-weight: 600; color: var(--text); background: var(--surface-2);
+    user-select: none; transition: background 0.15s ease;
+}
+.config-section-header:hover { background: var(--border-light); }
+.config-section-header .arrow { font-size: 10px; color: var(--text-secondary); transition: transform 0.3s ease; }
+.config-section-header.open .arrow { transform: rotate(0deg); }
+.config-section-header:not(.open) .arrow { transform: rotate(-90deg); }
+
+/* ── Pricing Table ── */
+.pricing-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.pricing-table th { padding: 6px 8px; text-align: left; background: var(--surface-2); color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-light); font-size: 10px; text-transform: uppercase; }
+.pricing-table td { padding: 5px 8px; border-bottom: 1px solid var(--border-light); color: var(--text); }
+.pricing-table tr:hover { background: var(--surface-2); }
+.pricing-table tr.current-combo { background: rgba(99,102,241,0.1); font-weight: 600; }
+.pricing-table .cost-cell { font-family: 'SF Mono', monospace; font-weight: 600; }
+.pricing-table .cost-low { color: #10b981; }
+.pricing-table .cost-mid { color: #f59e0b; }
+.pricing-table .cost-high { color: #ef4444; }
+
+/* ── Patient Screening ── */
+.patient-screening { animation: detailIn 0.25s ease; flex-shrink: 0; max-height: 440px; overflow-y: auto; }
+.screening-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.field-updated { transition: background 0.3s ease; background: rgba(99,102,241,0.15) !important; }
+.screening-field { display: flex; flex-direction: column; gap: 1px; padding: 4px 8px; background: var(--surface-2); border-radius: 6px; transition: all 0.3s ease; }
+.screening-field.full { grid-column: span 2; }
+.screening-field label { font-size: 10px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
+.screening-field span { font-size: 13px; color: var(--text); font-weight: 500; }
+.screening-field.referred { background: rgba(99,102,241,0.1); border: 1px solid var(--primary-light); }
+.screening-field.referred span { color: var(--primary); font-weight: 600; }
+.screening-field.next-ask { background: rgba(251,191,36,0.12); border: 1.5px solid rgba(251,191,36,0.5); animation: pulseAsk 2s ease-in-out infinite; }
+.screening-field.next-ask label { color: #b45309; font-weight: 700; }
+.screening-field.next-ask label::after { content: " ← next"; font-size: 9px; font-weight: 500; color: #d97706; margin-left: 4px; }
+.screening-field.collected { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3); }
+.screening-field.collected label { color: #16a34a; }
+.screening-field.hidden-vital { display: none; }
+@keyframes pulseAsk { 0%,100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); } 50% { box-shadow: 0 0 8px 2px rgba(251,191,36,0.25); } }
+
+/* Conversation Flow Stepper */
+.flow-stepper { display: flex; align-items: center; gap: 0; padding: 8px 8px 20px; overflow-x: auto; justify-content: center; }
+.flow-step { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+.flow-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-muted); transition: all 0.3s ease; position: relative; z-index: 1; font-weight: 600; }
+.flow-step .step-label { font-size: 10px; color: var(--text-muted); position: absolute; top: 32px; white-space: nowrap; text-align: center; left: 50%; transform: translateX(-50%); font-weight: 500; }
+.flow-step .step-dot-wrap { position: relative; }
+.flow-step .step-line { width: 36px; height: 2px; background: var(--border); flex-shrink: 0; }
+.flow-step.done .step-dot { background: #22c55e; border-color: #16a34a; color: white; }
+.flow-step.done .step-label { color: #16a34a; }
+.flow-step.done .step-line { background: #22c55e; }
+.flow-step.active .step-dot { background: #f59e0b; border-color: #d97706; color: white; animation: pulseAsk 2s ease-in-out infinite; }
+.flow-step.active .step-label { color: #d97706; font-weight: 700; }
+.flow-step.skipped .step-dot { background: #f59e0b; border-color: #d97706; color: white; }
+.flow-step.skipped .step-label { color: #d97706; }
+.flow-step.skipped .step-line { background: #f59e0b; }
+.print-slip-btn { background: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; }
+.print-slip-btn:hover { background: var(--primary-hover); }
+
+/* ── Print Slip Styles ── */
+@media print {
+    body * { visibility: hidden !important; }
+    #printSlipOverlay, #printSlipOverlay * { visibility: visible !important; }
+    #printSlipOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; }
+}
+.slip-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; }
+.slip-overlay.active { display: flex; }
+.slip-content { background: white; width: 400px; padding: 0; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.slip-header { text-align: center; padding: 20px 24px 12px; border-bottom: 2px dashed #ddd; }
+.slip-header h2 { font-size: 18px; color: #1a1a2e; margin: 0; }
+.slip-header p { font-size: 11px; color: #666; margin: 4px 0 0; }
+.slip-body { padding: 16px 24px; }
+.slip-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+.slip-row .slip-label { color: #666; font-weight: 500; }
+.slip-row .slip-value { color: #1a1a2e; font-weight: 600; text-align: right; max-width: 60%; }
+.slip-referral { margin: 12px 0; padding: 12px; background: #f0f0ff; border-radius: 8px; border: 1px solid #c7d2fe; text-align: center; }
+.slip-referral .doctor { font-size: 16px; font-weight: 700; color: #4338ca; }
+.slip-referral .dept { font-size: 12px; color: #6366f1; margin-top: 2px; }
+.slip-referral .room { font-size: 14px; color: #1a1a2e; margin-top: 6px; font-weight: 600; }
+.slip-footer { text-align: center; padding: 12px 24px 20px; border-top: 2px dashed #ddd; font-size: 10px; color: #999; }
+.slip-actions { display: flex; gap: 8px; justify-content: center; padding: 0 24px 16px; }
+.slip-actions button { flex: 1; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.slip-actions .btn-print { background: #4338ca; color: white; }
+.slip-actions .btn-close { background: #f1f1f1; color: #333; }
+
+/* ── Doctors Panel ── */
+.doctors-grid { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+.doctor-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    border-radius: 10px; border: 1px solid var(--border-light);
+    transition: all 0.15s ease; cursor: default;
+}
+.doctor-row:hover { background: var(--surface-2); border-color: var(--border); }
+.doctor-row.unavailable { opacity: 0.5; }
+.doctor-avatar {
+    width: 34px; height: 34px; border-radius: 8px; display: flex;
+    align-items: center; justify-content: center; font-size: 14px; font-weight: 700;
+    background: linear-gradient(135deg, #e0f2fe, #cffafe); color: var(--primary);
+    flex-shrink: 0;
+}
+.doctor-row.unavailable .doctor-avatar { background: #fee2e2; color: var(--danger); }
+.doctor-info { flex: 1; min-width: 0; }
+.doctor-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doctor-spec { font-size: 11px; color: var(--text-secondary); }
+.doctor-room {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+    background: var(--surface-2); color: var(--text-secondary);
+    white-space: nowrap;
+}
+.doctor-status {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.doctor-status.online { background: var(--success); }
+.doctor-status.offline { background: var(--danger); }
+
+/* ── Settings ── */
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.setting-group label {
+    display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.setting-group select {
+    width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 13px; font-family: inherit; background: var(--surface);
+    color: var(--text); cursor: pointer; transition: border-color 0.2s;
+    appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5l-5-5h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+}
+.setting-group select:focus { outline: none; border-color: var(--primary-light); }
+
+/* ── Quick Ref ── */
+.quick-ref { display: flex; flex-direction: column; gap: 6px; }
+.quick-ref-item {
+    display: flex; align-items: center; gap: 8px; font-size: 12px;
+    color: var(--text-secondary); padding: 4px 0;
+}
+.quick-ref-item .icon { font-size: 14px; width: 20px; text-align: center; }
+
+/* ── Collapsible ── */
+.collapsible-toggle {
+    cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between;
+}
+.collapsible-toggle .arrow { transition: transform 0.2s ease; font-size: 12px; color: var(--text-muted); }
+.collapsible-toggle.open .arrow { transform: rotate(180deg); }
+.collapsible-body { overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease; }
+.collapsible-body.collapsed { max-height: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; opacity: 0; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Audio (hidden) ── */
+#audioPlayer { display: none; }
+
+/* ── Doctor Inline Detail ── */
+.doctor-detail {
+    display: none; border: 1.5px solid var(--primary-light);
+    animation: detailIn 0.25s ease;
+}
+.doctor-detail.active { display: flex; flex-direction: column; }
+@keyframes detailIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+.detail-header {
+    display: flex; align-items: center; gap: 12px; flex: 1;
+}
+.detail-avatar {
+    width: 44px; height: 44px; border-radius: 12px; display: flex;
+    align-items: center; justify-content: center; font-size: 16px; font-weight: 700;
+    flex-shrink: 0;
+}
+.detail-avatar.male { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1d4ed8; }
+.detail-avatar.female { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; }
+.detail-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.detail-spec { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+.detail-status {
+    margin-left: auto; padding: 3px 10px; border-radius: 14px; font-size: 10px; font-weight: 600;
+}
+.detail-status.online { background: var(--success-light); color: var(--success); }
+.detail-status.offline { background: var(--danger-light); color: var(--danger); }
+.detail-close {
+    margin-left: 6px; width: 24px; height: 24px; border: none; border-radius: 6px;
+    background: var(--border-light); color: var(--text-muted); cursor: pointer;
+    font-size: 14px; display: flex; align-items: center; justify-content: center;
+}
+.detail-close:hover { background: var(--border); color: var(--text); }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.detail-field label {
+    display: block; font-size: 9px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+}
+.detail-field .value { font-size: 12px; font-weight: 500; color: var(--text); }
+.detail-expertise {
+    margin-top: 10px; padding: 10px 12px; background: var(--surface);
+    border-radius: 8px; border: 1px solid var(--border-light);
+}
+.detail-expertise label { display: block; font-size: 9px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.detail-expertise .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.detail-expertise .tag {
+    padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 500;
+    background: #ecfeff; color: var(--primary); border: 1px solid #a5f3fc;
+}
+
+/* ── Gender badge on voice options ── */
+.voice-gender { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 4px; margin-left: 4px; }
+
+/* ── Triage Dashboard ── */
+.triage-dashboard { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; padding: 2px; }
+.triage-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: linear-gradient(135deg, #ecfeff, #f0fdf4);
+    border-radius: 10px; border: 1px solid var(--border-light);
+}
+.triage-header-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.triage-header-subtitle { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.triage-match-badge {
+    padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 700;
+    background: var(--surface-2); color: var(--text-muted);
+}
+.triage-match-badge.has-match { background: linear-gradient(135deg, #059669, #0d9488); color: white; }
+
+.cluster-card {
+    background: var(--surface); border-radius: 10px; border: 1.5px solid var(--border-light);
+    overflow: hidden; transition: all 0.4s ease;
+}
+.cluster-card.top-match {
+    border-color: var(--primary-light); box-shadow: 0 2px 12px rgba(14,116,144,0.15);
+}
+.cluster-card.faded { opacity: 0.4; transform: scale(0.97); }
+.cluster-card-header {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    background: var(--surface-2); cursor: pointer; user-select: none;
+    transition: background 0.2s;
+}
+.cluster-card-header:hover { background: var(--border-light); }
+.cluster-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+.cluster-info { flex: 1; min-width: 0; }
+.cluster-dept { font-size: 13px; font-weight: 700; color: var(--text); }
+.cluster-doctor { font-size: 11px; color: var(--text-secondary); }
+.cluster-score-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.cluster-score-bar {
+    width: 50px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.cluster-score-fill {
+    height: 100%; border-radius: 3px; transition: width 0.6s ease, background 0.4s ease;
+    background: var(--border);
+}
+.cluster-score-fill.low { background: var(--text-muted); }
+.cluster-score-fill.mid { background: var(--warning); }
+.cluster-score-fill.high { background: var(--success); }
+.cluster-score-fill.top { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+.cluster-pct {
+    font-size: 12px; font-weight: 700; min-width: 32px; text-align: right;
+    color: var(--text-muted); transition: color 0.4s;
+}
+.cluster-pct.high { color: var(--success); }
+.cluster-pct.top { color: var(--primary); }
+
+.cluster-card-body {
+    padding: 0 14px 10px; max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+}
+.cluster-card.expanded .cluster-card-body { max-height: 800px; padding: 8px 14px 12px; overflow-y: auto; }
+
+.cluster-matched {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;
+}
+.cluster-matched-tag {
+    padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600;
+    background: rgba(14,116,144,0.1); color: var(--primary); border: 1px solid rgba(14,116,144,0.2);
+    cursor: default;
+}
+.cluster-matched-tag[title], .cond-sym-tag[title] { cursor: pointer; }
+
+.condition-list { display: flex; flex-direction: column; gap: 4px; }
+.condition-item {
+    display: flex; flex-direction: column; gap: 4px; padding: 8px 10px;
+    background: var(--surface-2); border-radius: 8px; font-size: 11px;
+    transition: all 0.3s; border: 1px solid transparent;
+}
+.condition-item.highlight { background: rgba(14,116,144,0.06); border-color: rgba(14,116,144,0.18); }
+.cond-header { display: flex; align-items: center; gap: 8px; }
+.condition-name { flex: 1; font-weight: 700; color: var(--text); font-size: 12px; }
+.condition-icd {
+    font-size: 9px; color: var(--primary); font-family: 'SF Mono', monospace;
+    background: rgba(14,116,144,0.08); padding: 1px 6px; border-radius: 4px;
+}
+.condition-score-bar {
+    width: 36px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+}
+.condition-score-fill {
+    height: 100%; border-radius: 2px; transition: width 0.6s ease;
+    background: var(--primary-light);
+}
+.condition-pct { font-size: 10px; font-weight: 600; color: var(--text-secondary); min-width: 26px; text-align: right; }
+
+/* Condition detail rows */
+.cond-symptoms { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 2px; }
+.cond-sym-tag {
+    padding: 1px 6px; border-radius: 8px; font-size: 9px;
+    background: var(--surface); color: var(--text-muted); border: 1px solid var(--border-light);
+    transition: all 0.3s;
+}
+.cond-sym-tag.matched {
+    background: rgba(14,116,144,0.12); color: var(--primary); border-color: rgba(14,116,144,0.3);
+    font-weight: 700;
+}
+.cond-vitals { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 2px; }
+.cond-vital-tag {
+    padding: 1px 6px; border-radius: 8px; font-size: 9px;
+    background: rgba(168,85,247,0.08); color: #7c3aed; border: 1px solid rgba(168,85,247,0.15);
+}
+.cond-vital-tag b { font-weight: 700; }
+.cond-severity { display: flex; gap: 3px; margin-top: 2px; }
+.cond-sev-tag {
+    padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 600;
+    background: var(--surface); border: 1px solid var(--border-light); color: var(--text-muted);
+}
+.cond-sev-tag.mild { background: rgba(34,197,94,0.08); color: #16a34a; border-color: rgba(34,197,94,0.2); }
+.cond-sev-tag.moderate { background: rgba(245,158,11,0.08); color: #d97706; border-color: rgba(245,158,11,0.2); }
+.cond-sev-tag.severe { background: rgba(239,68,68,0.08); color: #dc2626; border-color: rgba(239,68,68,0.2); }
+
+.triage-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 30px; color: var(--text-muted); text-align: center; gap: 8px;
+}
+.triage-empty .icon { font-size: 36px; opacity: 0.4; }
+.triage-empty p { font-size: 12px; line-height: 1.5; max-width: 260px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <div class="header-icon">🏥</div>
+        <div>
+            <div class="header-title">{{HOSPITAL_NAME}}</div>
+            <div class="header-subtitle">AI Clinical Triage System</div>
+        </div>
+    </div>
+    <div class="header-badges">
+        <span class="header-badge">Voice Enabled</span>
+        <span class="header-badge">Multilingual</span>
+        <span class="header-badge">Smart Triage</span>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <!-- Left Column -->
+    <div class="col-left">
+        <!-- Controls + Status -->
+        <div style="display:flex; gap:12px; align-items:center;">
+            <div class="controls">
+                <button class="btn btn-primary" id="btnStart" onclick="startSession()">
+                    <span>🎙️</span> New Patient
+                </button>
+                <button class="btn btn-danger" id="btnStop" onclick="stopSession()" style="display:none;">
+                    <span>⏹</span> End Session
+                </button>
+            </div>
+            <div class="status-bar" style="flex:1;">
+                <div class="status-dot ready" id="statusDot"></div>
+                <span class="status-text" id="statusText">Ready to assist</span>
+                <div class="mic-meter">
+                    <div class="mic-meter-fill" id="micMeter"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STT Live -->
+        <div class="stt-live empty rtl" id="sttLive">Waiting for patient to speak...</div>
+
+        <!-- Patient Screening Card -->
+        <div class="card patient-screening" id="patientScreeningCard">
+            <div class="card-header" style="padding:8px 16px; display:flex; align-items:center; justify-content:space-between;">
+                <h3 class="collapsible-toggle open" onclick="toggleSection(this, 'screeningBody')" style="cursor:pointer; display:flex; align-items:center; gap:8px; flex:0 1 auto; overflow:hidden;">📋 Patient Screening <span class="arrow">▼</span></h3>
+                <button onclick="event.stopPropagation(); printSlip()" class="print-slip-btn" id="printSlipBtn" style="display:none; flex-shrink:0; position:relative; z-index:5;" title="Print Referral Slip">🖨️ Print Slip</button>
+            </div>
+            <div class="card-body collapsible-body" id="screeningBody" style="padding:8px 16px;">
+                <!-- Conversation Flow Stepper -->
+                <div class="flow-stepper" id="flowStepper">
+                    <div class="flow-step active" id="flowName">
+                        <div class="step-dot-wrap"><div class="step-dot">1</div><div class="step-label">Name</div></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="flow-step" id="flowSymptoms">
+                        <div class="step-dot-wrap"><div class="step-dot">2</div><div class="step-label">Symptoms</div></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="flow-step" id="flowDuration">
+                        <div class="step-dot-wrap"><div class="step-dot">3</div><div class="step-label">Duration</div></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="flow-step" id="flowVital">
+                        <div class="step-dot-wrap"><div class="step-dot">4</div><div class="step-label" id="flowVitalLabel">Vitals</div></div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="flow-step" id="flowRefer">
+                        <div class="step-dot-wrap"><div class="step-dot" id="flowReferDot">5</div><div class="step-label">Refer</div></div>
+                    </div>
+                </div>
+                <div class="screening-grid" id="screeningGrid">
+                    <div class="screening-field"><label>Name</label><span id="scrName">—</span></div>
+                    <div class="screening-field"><label>Age</label><span id="scrAge">—</span></div>
+                    <div class="screening-field"><label>Gender</label><span id="scrGender">—</span></div>
+                    <div class="screening-field"><label>Visit</label><span id="scrVisit">—</span></div>
+                    <div class="screening-field full"><label>Symptoms</label><span id="scrSymptoms">—</span></div>
+                    <div class="screening-field"><label>Duration</label><span id="scrDuration">—</span></div>
+                    <div class="screening-field"><label>Severity</label><span id="scrSeverity">—</span></div>
+                    <div class="screening-field"><label>Fever</label><span id="scrFever">—</span></div>
+                    <div class="screening-field"><label>BP</label><span id="scrBP">—</span></div>
+                    <div class="screening-field"><label>Heart Rate</label><span id="scrHeartRate">—</span></div>
+                    <div class="screening-field"><label>Temperature</label><span id="scrTemperature">—</span></div>
+                    <div class="screening-field"><label>Sugar Level</label><span id="scrSugarLevel">—</span></div>
+                    <div class="screening-field"><label>Mobility</label><span id="scrMobility">—</span></div>
+                    <div class="screening-field full"><label>Notes</label><span id="scrNotes">—</span></div>
+                    <div class="screening-field referred full" id="scrReferralSection" style="display:none;">
+                        <label>Referred To</label>
+                        <span id="scrReferred">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversation -->
+        <div class="card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+            <div class="card-header">
+                <h3>💬 Conversation</h3>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="model-tag stt" id="convLangBadge" style="font-size:10px;">🗣 Urdu</span>
+                    <span style="font-size:12px; color:var(--text-muted);" id="msgCount">0 messages</span>
+                </div>
+            </div>
+            <div class="conversation rtl" id="conversation">
+                <div class="conversation-empty" id="emptyState">
+                    <div class="icon">🏥</div>
+                    <p>Welcome to {{HOSPITAL_NAME}}<br><br>
+                    Click <b>"New Patient"</b> to start a session.<br>
+                    The AI assistant <b>Amina</b> will help with patient registration and doctor referral.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-right">
+        <div class="right-tabs">
+            <button class="right-tab active" onclick="switchTab('hospital')">🏥 Hospital</button>
+            <button class="right-tab" onclick="switchTab('triage')">📊 Triage</button>
+            <button class="right-tab" onclick="switchTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- Hospital Tab -->
+        <div class="tab-panel active" id="tab-hospital">
+        <!-- Doctors Panel -->
+        <div class="card" style="flex:1; min-height:0; display:flex; flex-direction:column;">
+            <div class="card-header collapsible-toggle open" onclick="toggleSection(this, 'doctorsBody')">
+                <h3>👨‍⚕️ Doctors On Duty</h3>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="card-body collapsible-body" id="doctorsBody" style="flex:1; overflow-y:auto; max-height: none;">
+                <div class="doctors-grid" id="doctorsGrid"></div>
+            </div>
+        </div>
+
+        <!-- Doctor Detail (separate card, hidden until clicked) -->
+        <div class="card doctor-detail" id="doctorDetail">
+            <div class="card-header" style="padding: 12px 16px;">
+                <div class="detail-header">
+                    <div class="detail-avatar" id="detailAvatar"></div>
+                    <div>
+                        <div class="detail-name" id="detailName"></div>
+                        <div class="detail-spec" id="detailSpec"></div>
+                    </div>
+                    <div class="detail-status" id="detailStatus"></div>
+                </div>
+                <button class="detail-close" onclick="closeDoctorDetail()" title="Close">✕</button>
+            </div>
+            <div class="card-body" style="padding: 14px 16px;">
+                <div class="detail-grid">
+                    <div class="detail-field"><label>Qualification</label><div class="value" id="detailQual"></div></div>
+                    <div class="detail-field"><label>Experience</label><div class="value" id="detailExp"></div></div>
+                    <div class="detail-field"><label>Room</label><div class="value" id="detailRoom"></div></div>
+                    <div class="detail-field"><label>Timings</label><div class="value" id="detailTime"></div></div>
+                    <div class="detail-field"><label>Phone</label><div class="value" id="detailPhone"></div></div>
+                    <div class="detail-field"><label>Languages</label><div class="value" id="detailLang"></div></div>
+                </div>
+                <div class="detail-expertise">
+                    <label>Areas of Expertise</label>
+                    <div class="tags" id="detailExpertise"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="card" id="quickRefCard">
+            <div class="card-header collapsible-toggle open" onclick="toggleSection(this, 'quickRefBody')">
+                <h3>📍 Quick Reference</h3>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="card-body collapsible-body" id="quickRefBody">
+                <div class="quick-ref">
+                    <div class="quick-ref-item"><span class="icon">🚨</span> Emergency — Ground Floor</div>
+                    <div class="quick-ref-item"><span class="icon">💊</span> Pharmacy — Ground Floor, Wing B</div>
+                    <div class="quick-ref-item"><span class="icon">🔬</span> Laboratory — 1st Floor, Room 130</div>
+                    <div class="quick-ref-item"><span class="icon">📡</span> Radiology — 1st Floor, Room 140</div>
+                    <div class="quick-ref-item"><span class="icon">🏋️</span> Physiotherapy — 2nd Floor, Room 220</div>
+                    <div class="quick-ref-item"><span class="icon">💳</span> Billing — Ground Floor, Main Lobby</div>
+                </div>
+            </div>
+        </div>
+
+        </div><!-- end tab-hospital -->
+
+        <!-- Triage Dashboard Tab -->
+        <div class="tab-panel" id="tab-triage">
+            <div class="card" style="flex:1; min-height:0; display:flex; flex-direction:column;">
+                <div class="card-header">
+                    <h3>📊 Smart Triage</h3>
+                    <span style="font-size:11px; color:var(--text-muted);" id="triageStatus">Waiting for symptoms...</span>
+                </div>
+                <div class="card-body" style="flex:1; overflow-y:auto; padding:12px 14px;">
+                    <div class="triage-header" id="triageHeader">
+                        <div>
+                            <div class="triage-header-title">Real-Time Differential Triage</div>
+                            <div class="triage-header-subtitle" id="triageSubtitle">All departments shown — speak to narrow focus</div>
+                        </div>
+                        <div class="triage-match-badge" id="triageMatchBadge">0 matches</div>
+                    </div>
+                    <div class="triage-dashboard" id="triageDashboard">
+                        <div class="triage-empty" id="triageEmpty">
+                            <div class="icon">📊</div>
+                            <p>Disease clustering will appear here as the patient describes symptoms. Start a session and speak to see real-time triage analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- end tab-triage -->
+
+        <!-- Settings Tab -->
+        <div class="tab-panel" id="tab-settings">
+        <!-- Configuration Panel -->
+        <div class="card" style="flex:1; min-height:0; display:flex; flex-direction:column;">
+            <div style="flex:1; overflow-y:auto;">
+                <!-- Agent Profile Section -->
+                <div class="config-section">
+                    <div class="config-section-header open" onclick="toggleSection(this, 'agentProfileBody')">
+                        <span>🤖 Agent Profile</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="collapsible-body" id="agentProfileBody" style="padding:12px 20px;">
+                        <div class="agent-summary" id="agentSummary">
+                            <div class="agent-avatar" id="agentAvatar">A</div>
+                            <div class="agent-summary-info">
+                                <div class="agent-summary-name" id="agentSummaryName">Amina</div>
+                                <div class="agent-summary-details" id="agentSummaryTags">
+                                    <span class="agent-summary-tag gender">♀ Female</span>
+                                    <span class="agent-summary-tag">Warm & Caring</span>
+                                    <span class="agent-summary-tag lang">Urdu</span>
+                                    <span class="agent-summary-tag style">Formal</span>
+                                </div>
+                                <div class="agent-summary-desc" id="agentSummaryDesc" style="font-size:12px; color:var(--text-secondary); margin-top:8px; line-height:1.5; font-style:italic;">
+                                    Loading agent profile...
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-grid">
+                            <div class="setting-group" style="grid-column: span 2;">
+                                <label>Agent Persona</label>
+                                <select id="agentPersona" onchange="onAgentPersonaChange(this.value)">
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Language</label>
+                                <select id="sttLang" onchange="updateSetting('stt_language', this.value); updateAgentProfileSummary(); updateConversationDirection()">
+                                    <option value="Urdu">Urdu</option>
+                                    <option value="English">English</option>
+                                    <option value="Punjabi">Punjabi</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="Arabic">Arabic</option>
+                                    <option value="Malay">Malay</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Personality</label>
+                                <select id="agentPersonality" onchange="updateSetting('agent_personality', this.value); updateAgentProfileSummary()">
+                                    <option value="warm">Warm & Caring</option>
+                                    <option value="professional">Professional</option>
+                                    <option value="friendly">Friendly & Casual</option>
+                                </select>
+                            </div>
+                            <div class="setting-group" style="grid-column: span 2;">
+                                <label>Language Style</label>
+                                <select id="agentLangStyle" onchange="updateSetting('agent_lang_style', this.value); updateAgentProfileSummary()">
+                                    <option value="formal">Formal</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="native">Native</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Model Profile Section -->
+                <div class="config-section">
+                    <div class="config-section-header open" onclick="toggleSection(this, 'settingsBody')">
+                        <span>🔧 AI Model Profile</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="collapsible-body" id="settingsBody" style="padding:12px 20px;">
+                        <div class="settings-grid">
+                            <div class="setting-group" style="grid-column: span 2;">
+                                <label>STT Model</label>
+                                <select id="sttModel" onchange="updateSetting('stt_model', this.value); updateModelProfile()">
+                                    <option value="OpenAI Realtime">OpenAI Realtime — $0.006/min</option>
+                                    <option value="Deepgram Nova-3">Deepgram Nova-3 — $0.0077/min</option>
+                                </select>
+                                <div id="sttModelTags" class="model-tags"></div>
+                            </div>
+                            <div class="setting-group" style="grid-column: span 2;">
+                                <label>LLM Model</label>
+                                <select id="llmModel" onchange="updateSetting('llm_model', this.value); updateModelProfile()">
+                                    <optgroup label="OpenAI GPT">
+                                        <option value="gpt-4o-mini">GPT-4o Mini — $0.15/1M tokens</option>
+                                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo — $0.50/1M tokens</option>
+                                        <option value="gpt-4o">GPT-4o — $2.50/1M tokens</option>
+                                        <option value="gpt-4-turbo">GPT-4 Turbo — $10.00/1M tokens</option>
+                                    </optgroup>
+                                    <optgroup label="Anthropic Claude">
+                                        <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — $1.00/1M tokens</option>
+                                        <option value="claude-sonnet-4-6-20250514">Claude Sonnet 4.6 — $3.00/1M tokens</option>
+                                    </optgroup>
+                                </select>
+                                <div id="llmModelTags" class="model-tags"></div>
+                            </div>
+                            <div class="setting-group">
+                                <label>TTS Provider</label>
+                                <select id="ttsProvider" onchange="updateTTSProvider(this.value)">
+                                    <option value="OpenAI">OpenAI</option>
+                                    <option value="ElevenLabs">ElevenLabs</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>TTS Model</label>
+                                <select id="ttsModel" onchange="updateSetting('tts_model', this.value); updateModelProfile()"></select>
+                            </div>
+                            <div class="setting-group">
+                                <label>TTS Voice</label>
+                                <select id="ttsVoice" onchange="onVoiceChange(this.value)"></select>
+                            </div>
+                            <div id="ttsModelTags" class="model-tags" style="grid-column: span 2;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Reference Section -->
+                <div class="config-section">
+                    <div class="config-section-header" onclick="toggleSection(this, 'pricingBody')">
+                        <span>💰 Cost per Interaction</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="collapsible-body collapsed" id="pricingBody" style="padding:12px 16px; max-height:0;">
+                        <div class="pricing-current" id="pricingCurrent" style="margin-bottom:12px; padding:10px 14px; background:var(--surface-2); border-radius:8px; font-size:12px;"></div>
+                        <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+                        <table class="pricing-table" style="min-width:920px;">
+                            <thead>
+                                <tr><th>#</th><th>STT</th><th>LLM</th><th>TTS</th><th>$/min</th><th title="With 80% TTS cache hit rate">Cached</th><th>Save</th><th title="Monthly without cache, 8h×5d">8h×5d</th><th title="Monthly with cache, 8h×5d">Cached</th><th title="Monthly saved with cache, 8h×5d">Saved</th><th title="Monthly without cache, 24×7">24×7</th><th title="Monthly with cache, 24×7">Cached</th><th title="Monthly saved with cache, 24×7">Saved</th></tr>
+                            </thead>
+                            <tbody id="pricingTableBody"></tbody>
+                        </table>
+                        </div>
+                        <div style="margin-top:8px; font-size:10px; color:var(--text-secondary); line-height:1.5;">
+                            Per interaction: 30s speech (STT), 200 tokens in/out (LLM), 500 chars (TTS). Monthly: ~1 interaction/min continuous. ElevenLabs at Scale plan rates.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div><!-- end tab-settings -->
+    </div>
+</div>
+
+
+<script>
+function switchTab(tabName, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.right-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+    if (btn) btn.classList.add('active');
+    else if (event && event.currentTarget) event.currentTarget.classList.add('active');
+}
+
+let ws = null;
+let msgCounter = 0;
+
+function getAgentName() {
+    const sel = document.getElementById("agentPersona");
+    return sel ? sel.value : "Amina";
+}
+
+const STATUS_MAP = {
+    ready:      { text: "Ready to assist",   dot: "ready" },
+    connecting: { text: "Connecting...",      dot: "connecting" },
+    listening:  { text: "Listening...",       dot: "listening" },
+    thinking:   { text: null,                dot: "thinking" },
+    speaking:   { text: null,                dot: "speaking" },
+    ended:      { text: "Session ended",      dot: "ended" },
+};
+
+const TTS_MODELS = {
+    "OpenAI": [
+        {value: "tts-1", label: "TTS-1 (Fast) — $0.015/1K chars"},
+        {value: "tts-1-hd", label: "TTS-1 HD (Quality) — $0.030/1K chars"},
+    ],
+    "ElevenLabs": [
+        {value: "eleven_flash_v2_5", label: "Flash v2.5 — ~$0.06-0.15/1K chars"},
+        {value: "eleven_turbo_v2_5", label: "Turbo v2.5 — ~$0.06-0.15/1K chars"},
+        {value: "eleven_multilingual_v2", label: "Multilingual v2 — ~$0.12-0.30/1K chars"},
+    ],
+};
+
+const MODEL_INFO = {
+    stt: {
+        "Deepgram Nova-3": {
+            icon: "🎙️", speed: "Real-time", accuracy: "High",
+            desc: "Deepgram's latest Nova-3 model. Optimized for real-time streaming with low latency. Supports 30+ languages with automatic punctuation and endpointing.",
+            traits: ["Streaming", "Low Latency", "Multilingual", "Punctuation"]
+        },
+        "OpenAI Realtime": {
+            icon: "🎙️", speed: "Real-time", accuracy: "Very High",
+            desc: "OpenAI's gpt-4o-transcribe model with real-time streaming via pipecat. High accuracy multilingual transcription. Changes take effect on next session.",
+            traits: ["Streaming", "High Accuracy", "100+ Languages", "Next Session"]
+        }
+    },
+    llm: {
+        "gpt-4o-mini": {
+            icon: "🧠", speed: "Fast", cost: "Low",
+            desc: "Lightweight, fast GPT-4o variant. Best balance of speed and quality for conversational tasks. Low token cost, ideal for real-time dialogue.",
+            traits: ["Fast Response", "Low Cost", "Good Quality", "128K Context"]
+        },
+        "gpt-4o": {
+            icon: "🧠", speed: "Medium", cost: "High",
+            desc: "Full GPT-4o model. Superior reasoning and nuanced responses but higher latency and cost. Use when quality matters more than speed.",
+            traits: ["Best Quality", "Higher Cost", "Slower", "128K Context"]
+        },
+        "gpt-4-turbo": {
+            icon: "🧠", speed: "Medium", cost: "High",
+            desc: "GPT-4 Turbo with vision capabilities. Strong reasoning, good for complex medical triage but slower first-token time.",
+            traits: ["Strong Reasoning", "Vision", "Higher Latency", "128K Context"]
+        },
+        "gpt-3.5-turbo": {
+            icon: "🧠", speed: "Very Fast", cost: "Very Low",
+            desc: "Fastest and cheapest option. Adequate for simple conversations but may miss nuance in complex medical queries.",
+            traits: ["Fastest", "Cheapest", "Basic Quality", "16K Context"]
+        },
+        "claude-haiku-4-5-20251001": {
+            icon: "🟣", speed: "Fast", cost: "Low",
+            desc: "Anthropic's fastest model. Excellent instruction following and structured output. Great for real-time medical triage with reliable JSON extraction.",
+            traits: ["Fast Response", "Low Cost", "Great Instructions", "200K Context"]
+        },
+        "claude-sonnet-4-6-20250514": {
+            icon: "🟣", speed: "Medium", cost: "Medium",
+            desc: "Anthropic's balanced model. Superior reasoning, excellent Urdu support, and highly reliable structured output. Best Claude option for quality.",
+            traits: ["High Quality", "Great Urdu", "Reliable JSON", "200K Context"]
+        }
+    },
+    tts: {
+        "tts-1": {
+            icon: "🔊", provider: "OpenAI", quality: "Good", latency: "Low",
+            desc: "OpenAI's optimized real-time TTS. Fast streaming with good quality. Best for low-latency conversational use.",
+            traits: ["Low Latency", "Streaming", "6 Voices", "Good Quality"]
+        },
+        "tts-1-hd": {
+            icon: "🔊", provider: "OpenAI", quality: "High", latency: "Medium",
+            desc: "OpenAI's high-definition TTS. Noticeably better audio quality but slightly higher latency. Best when voice clarity is priority.",
+            traits: ["HD Quality", "Slightly Slower", "6 Voices", "Clearer Audio"]
+        },
+        "eleven_flash_v2_5": {
+            icon: "🔊", provider: "ElevenLabs", quality: "Good", latency: "Low",
+            desc: "ElevenLabs Flash — fastest model with lowest latency. Does NOT support Urdu.",
+            traits: ["Fastest", "Low Latency", "Natural Voice", "32 Languages"]
+        },
+        "eleven_turbo_v2_5": {
+            icon: "🔊", provider: "ElevenLabs", quality: "High", latency: "Medium",
+            desc: "ElevenLabs Turbo — higher quality synthesis with richer prosody. Slightly more latency but more expressive and natural.",
+            traits: ["Better Quality", "Expressive", "Natural Prosody", "Multilingual"]
+        },
+        "eleven_multilingual_v2": {
+            icon: "🔊", provider: "ElevenLabs", quality: "High", latency: "Medium",
+            desc: "ElevenLabs Multilingual v2 — best for non-English languages. Superior accent and pronunciation for Urdu, Hindi, Arabic etc.",
+            traits: ["Best Multilingual", "29 Languages", "Natural Accents", "Higher Latency"]
+        }
+    }
+};
+
+const OPENAI_VOICES = [
+    {name:"nova",label:"Nova",gender:"F"},{name:"alloy",label:"Alloy",gender:"F"},
+    {name:"echo",label:"Echo",gender:"M"},{name:"fable",label:"Fable",gender:"M"},
+    {name:"onyx",label:"Onyx",gender:"M"},{name:"shimmer",label:"Shimmer",gender:"F"},
+];
+const ELEVEN_VOICES = [
+    {name:"Rachel",label:"Rachel",gender:"F"},{name:"Drew",label:"Drew",gender:"M"},
+    {name:"Clyde",label:"Clyde",gender:"M"},{name:"Paul",label:"Paul",gender:"M"},
+    {name:"Domi",label:"Domi",gender:"F"},{name:"Dave",label:"Dave",gender:"M"},
+    {name:"Fin",label:"Fin",gender:"M"},{name:"Sarah",label:"Sarah",gender:"F"},
+    {name:"Antoni",label:"Antoni",gender:"M"},{name:"Thomas",label:"Thomas",gender:"M"},
+];
+
+const AGENT_PERSONAS = [
+    {name:"Amina",    gender:"F", ttsProvider:"OpenAI",     ttsVoice:"nova",    label:"Amina"},
+    {name:"Ayesha",   gender:"F", ttsProvider:"OpenAI",     ttsVoice:"shimmer", label:"Ayesha"},
+    {name:"Fatima",   gender:"F", ttsProvider:"OpenAI",     ttsVoice:"alloy",   label:"Fatima"},
+    {name:"Hira",     gender:"F", ttsProvider:"ElevenLabs", ttsVoice:"Rachel",  label:"Hira"},
+    {name:"Sarah",    gender:"F", ttsProvider:"ElevenLabs", ttsVoice:"Sarah",   label:"Sarah"},
+    {name:"Ali",      gender:"M", ttsProvider:"OpenAI",     ttsVoice:"echo",    label:"Ali"},
+    {name:"Hassan",   gender:"M", ttsProvider:"OpenAI",     ttsVoice:"onyx",    label:"Hassan"},
+    {name:"Ahmed",    gender:"M", ttsProvider:"OpenAI",     ttsVoice:"fable",   label:"Ahmed"},
+    {name:"Bilal",    gender:"M", ttsProvider:"ElevenLabs", ttsVoice:"Drew",    label:"Bilal"},
+    {name:"Usman",    gender:"M", ttsProvider:"ElevenLabs", ttsVoice:"Paul",    label:"Usman"},
+];
+
+let _allDoctors = [];
+
+function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/ws`);
+    ws.onopen = () => console.log("WS connected");
+    ws.onclose = () => { console.log("WS closed"); setTimeout(connectWS, 2000); };
+    ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        handleMessage(msg);
+    };
+}
+
+function handleMessage(msg) {
+    switch (msg.type) {
+        case "status":
+            setStatus(msg.status);
+            break;
+        case "stt_live":
+            setSttLive(msg.text);
+            break;
+        case "mic_level":
+            setMicLevel(msg.rms);
+            break;
+        case "conversation":
+            addMessage(msg.role, msg.text);
+            break;
+        case "patient_data":
+            console.log("[Triage] patient_data received:", msg.data?.symptoms, "severity:", msg.data?.severity);
+            updatePatientScreening(msg.data);
+            computeClustersClientSide(msg.data);
+            break;
+        case "cluster_data":
+            console.log("[Triage] cluster_data received:", msg.clusters?.filter(c => c.score > 0).map(c => c.department + ":" + Math.round(c.score*100) + "%"));
+            updateTriageDashboard(msg.clusters);
+            break;
+        case "info":
+            console.log("Server info:", msg.text);
+            break;
+        case "clear":
+            clearConversation();
+            resetPatientScreening();
+            resetTriageDashboard();
+            break;
+        case "state":
+            restoreState(msg);
+            break;
+    }
+}
+
+function setStatus(status) {
+    const s = STATUS_MAP[status] || STATUS_MAP.ready;
+    document.getElementById("statusDot").className = "status-dot " + s.dot;
+    const name = getAgentName();
+    let text = s.text;
+    if (status === "thinking") text = name + " is thinking...";
+    else if (status === "speaking") text = name + " is speaking...";
+    document.getElementById("statusText").textContent = text;
+
+    const btnStart = document.getElementById("btnStart");
+    const btnStop = document.getElementById("btnStop");
+    if (status === "ready" || status === "ended") {
+        btnStart.style.display = "flex";
+        btnStop.style.display = "none";
+    } else {
+        btnStart.style.display = "none";
+        btnStop.style.display = "flex";
+    }
+}
+
+function setSttLive(text) {
+    const el = document.getElementById("sttLive");
+    if (text && text.trim()) {
+        el.textContent = text;
+        el.classList.remove("empty");
+    } else {
+        el.textContent = "Waiting for patient to speak...";
+        el.classList.add("empty");
+    }
+}
+
+function setMicLevel(rms) {
+    const pct = Math.min(rms * 800, 100);
+    document.getElementById("micMeter").style.width = pct + "%";
+}
+
+function addMessage(role, text) {
+    const empty = document.getElementById("emptyState");
+    if (empty) empty.remove();
+
+    const conv = document.getElementById("conversation");
+    const now = new Date().toLocaleTimeString("en-US", {hour:"2-digit", minute:"2-digit"});
+    const agentGender = _selectedGender;
+    const avatar = role === "patient" ? "🗣️" : (agentGender === "F" ? "👩‍⚕️" : "👨‍⚕️");
+
+    const div = document.createElement("div");
+    div.className = "msg " + role;
+    div.innerHTML = `
+        <div class="msg-avatar">${avatar}</div>
+        <div>
+            <div class="msg-bubble">${escapeHtml(text)}</div>
+            <div class="msg-time">${now}</div>
+        </div>
+    `;
+    conv.appendChild(div);
+    conv.scrollTop = conv.scrollHeight;
+
+    msgCounter++;
+    document.getElementById("msgCount").textContent = msgCounter + " message" + (msgCounter !== 1 ? "s" : "");
+}
+
+function clearConversation() {
+    const conv = document.getElementById("conversation");
+    const name = getAgentName();
+    conv.innerHTML = `
+        <div class="conversation-empty" id="emptyState">
+            <div class="icon">🏥</div>
+            <p>Welcome to {{HOSPITAL_NAME}}<br><br>
+            Click <b>"New Patient"</b> to start a session.<br>
+            The AI assistant <b>${escapeHtml(name)}</b> will help with patient registration and doctor referral.</p>
+        </div>`;
+    msgCounter = 0;
+    document.getElementById("msgCount").textContent = "0 messages";
+}
+
+function escapeHtml(text) {
+    const d = document.createElement("div");
+    d.textContent = text;
+    return d.innerHTML;
+}
+
+let rtcPc = null;
+let rtcPcId = null;
+let _cachedMicStream = null;  // Pre-warmed mic stream
+
+// Pre-warm mic on page load — eliminates ~300-500ms delay on session start
+(async function() {
+    try {
+        _cachedMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("Mic: Pre-warmed");
+    } catch(e) {
+        console.warn("Mic: Pre-warm failed (will retry on session start)", e);
+    }
+})();
+
+async function startSession() {
+    // Reset UI
+    clearConversation();
+    setSttLive("");
+    lockSettings();
+    resetPatientScreening();
+    resetTriageDashboard();
+    _autoEndTriggered = false;
+    _lastPatientDataJSON = "";
+
+    // Send settings batch AND get mic in parallel
+    const persona = AGENT_PERSONAS.find(x => x.name === document.getElementById("agentPersona").value);
+    if (persona && ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "settings_batch", settings: {
+            agent_name: persona.name,
+            agent_gender: persona.gender,
+            voice_gender: persona.gender,
+            tts_provider: document.getElementById("ttsProvider").value,
+            tts_model: document.getElementById("ttsModel").value,
+            tts_voice: document.getElementById("ttsVoice").value,
+            agent_personality: document.getElementById("agentPersonality").value,
+            agent_lang_style: document.getElementById("agentLangStyle").value,
+            stt_language: document.getElementById("sttLang").value,
+            llm_model: document.getElementById("llmModel").value,
+        }}));
+    }
+
+    try {
+        // Get mic stream (instant if pre-warmed, otherwise request now)
+        const micPromise = _cachedMicStream
+            ? Promise.resolve(_cachedMicStream)
+            : navigator.mediaDevices.getUserMedia({ audio: true });
+
+        // Create WebRTC peer connection in parallel with mic
+        rtcPc = new RTCPeerConnection({
+            iceServers: [
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:stun1.l.google.com:19302" },
+            ]
+        });
+
+        // Add audio transceiver (send mic + receive TTS)
+        rtcPc.addTransceiver("audio", { direction: "sendrecv" });
+
+        // Play remote audio (TTS from server)
+        rtcPc.ontrack = (event) => {
+            console.log("WebRTC: Got remote track", event.track.kind);
+            const audio = new Audio();
+            audio.srcObject = event.streams[0];
+            audio.autoplay = true;
+            audio.play().then(() => {
+                console.log("WebRTC: Audio playback started");
+            }).catch(e => {
+                console.warn("WebRTC: Autoplay blocked, will retry on click", e);
+                document.addEventListener("click", () => audio.play(), { once: true });
+            });
+        };
+
+        // Wait for mic and add tracks
+        const stream = await micPromise;
+        _cachedMicStream = stream;  // Cache for next session
+        stream.getTracks().forEach(track => rtcPc.addTrack(track, stream));
+
+        // Create offer + ICE gathering
+        const offer = await rtcPc.createOffer();
+        await rtcPc.setLocalDescription(offer);
+
+        // Wait for ICE gathering (short timeout — most candidates arrive fast)
+        await new Promise(resolve => {
+            if (rtcPc.iceGatheringState === "complete") return resolve();
+            rtcPc.onicegatheringstatechange = () => {
+                if (rtcPc.iceGatheringState === "complete") resolve();
+            };
+            setTimeout(resolve, 500);
+        });
+
+        // Send offer to server
+        const resp = await fetch("/api/offer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                sdp: rtcPc.localDescription.sdp,
+                type: rtcPc.localDescription.type,
+                pc_id: rtcPcId,
+            }),
+        });
+        const answer = await resp.json();
+        rtcPcId = answer.pc_id;
+
+        await rtcPc.setRemoteDescription(new RTCSessionDescription({
+            sdp: answer.sdp,
+            type: answer.type,
+        }));
+
+        console.log("WebRTC: Connected, pc_id=" + rtcPcId);
+    } catch (e) {
+        console.error("WebRTC: Failed to start session", e);
+        setStatus("ended");
+        unlockSettings();
+    }
+}
+
+function autoEndSession() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({action: "stop"}));
+    }
+    if (rtcPc) {
+        rtcPc.close();
+        rtcPc = null;
+        rtcPcId = null;
+    }
+    setSttLive("");
+    setMicLevel(0);
+    setStatus("ended");
+    unlockSettings();
+    document.getElementById("btnStart").style.display = "";
+    document.getElementById("btnStop").style.display = "none";
+}
+
+function stopSession() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({action: "stop"}));
+    }
+    // Close WebRTC
+    if (rtcPc) {
+        rtcPc.close();
+        rtcPc = null;
+        rtcPcId = null;
+    }
+    clearConversation();
+    setSttLive("");
+    setMicLevel(0);
+    setStatus("ended");
+    unlockSettings();
+}
+
+const CONFIG_SELECTS = ["agentPersona", "sttLang", "agentPersonality", "agentLangStyle", "sttModel", "llmModel", "ttsProvider", "ttsModel", "ttsVoice"];
+
+function lockSettings() {
+    CONFIG_SELECTS.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; });
+}
+
+function unlockSettings() {
+    CONFIG_SELECTS.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = false; });
+}
+
+function updateSetting(key, value) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({action: "setting", key: key, value: value}));
+    }
+}
+
+let _selectedGender = "F";
+
+function getFilteredVoices() {
+    const provider = document.getElementById("ttsProvider").value;
+    const allVoices = provider === "ElevenLabs" ? ELEVEN_VOICES : OPENAI_VOICES;
+    return allVoices.filter(v => v.gender === _selectedGender);
+}
+
+function renderVoiceOptions(voices, selectedName) {
+    const sel = document.getElementById("ttsVoice");
+    sel.innerHTML = voices.map(v => {
+        const gTag = v.gender === "F" ? "♀ Female" : "♂ Male";
+        const selected = v.name === selectedName ? " selected" : "";
+        return `<option value="${v.name}"${selected}>${v.label} (${gTag})</option>`;
+    }).join("");
+}
+
+function refreshVoicesForGender() {
+    const voices = getFilteredVoices();
+    if (voices.length > 0) {
+        renderVoiceOptions(voices, voices[0].name);
+        updateSetting("tts_voice", voices[0].name);
+        updateSetting("voice_gender", _selectedGender);
+    }
+}
+
+function onAgentPersonaChange(personaName) {
+    const p = AGENT_PERSONAS.find(x => x.name === personaName);
+    if (!p) return;
+    _selectedGender = p.gender;
+
+    // Update agent name & gender on backend
+    updateSetting("agent_name", p.name);
+    updateSetting("agent_gender", p.gender);
+    updateSetting("voice_gender", p.gender);
+
+    // Update TTS provider, model & voice to match persona
+    document.getElementById("ttsProvider").value = p.ttsProvider;
+    updateSetting("tts_provider", p.ttsProvider);
+
+    const defaultModel = TTS_MODELS[p.ttsProvider]?.[0]?.value || "";
+    renderTTSModels(p.ttsProvider, defaultModel);
+    updateSetting("tts_model", defaultModel);
+
+    const allVoices = p.ttsProvider === "ElevenLabs" ? ELEVEN_VOICES : OPENAI_VOICES;
+    const filtered = allVoices.filter(v => v.gender === p.gender);
+    renderVoiceOptions(filtered, p.ttsVoice);
+    updateSetting("tts_voice", p.ttsVoice);
+    updateAgentProfileSummary();
+    updateModelProfile();
+}
+
+function renderAgentPersonas(selectedName) {
+    const sel = document.getElementById("agentPersona");
+    const groups = [
+        {label: "♀ Female", filter: p => p.gender === "F"},
+        {label: "♂ Male",   filter: p => p.gender === "M"},
+    ];
+    sel.innerHTML = groups.map(g => {
+        const opts = AGENT_PERSONAS.filter(g.filter).map(p =>
+            `<option value="${p.name}"${p.name === selectedName ? " selected" : ""}>${p.label}</option>`
+        ).join("");
+        return opts ? `<optgroup label="${g.label}">${opts}</optgroup>` : "";
+    }).join("");
+}
+
+function updateAgentProfileSummary() {
+    const persona = AGENT_PERSONAS.find(x => x.name === document.getElementById("agentPersona").value);
+    const name = persona ? persona.name : "Amina";
+    const gender = persona ? persona.gender : "F";
+    const personality = document.getElementById("agentPersonality");
+    const lang = document.getElementById("sttLang");
+    const style = document.getElementById("agentLangStyle");
+
+    document.getElementById("agentAvatar").textContent = name.charAt(0);
+    document.getElementById("agentSummaryName").textContent = name;
+
+    const genderLabel = gender === "F" ? "♀ Female" : "♂ Male";
+    const personalityLabel = personality.options[personality.selectedIndex].text;
+    const langLabel = lang.value;
+    const styleLabel = style.options[style.selectedIndex].text;
+
+    const ttsProvider = persona ? persona.ttsProvider : "OpenAI";
+    const ttsVoice = persona ? persona.ttsVoice : "nova";
+
+    document.getElementById("agentSummaryTags").innerHTML =
+        `<span class="agent-summary-tag gender">${genderLabel}</span>` +
+        `<span class="agent-summary-tag">🎭 ${personalityLabel}</span>` +
+        `<span class="agent-summary-tag lang">🗣 ${langLabel}</span>` +
+        `<span class="agent-summary-tag style">✍ ${styleLabel}</span>` +
+        `<span class="agent-summary-tag" style="background:#6366f1">🔊 ${ttsVoice}</span>`;
+
+    // Build detailed behavior description
+    const genderExample = gender === "F"
+        ? 'Uses feminine forms: "میں بھیج رہی ہوں", "میں آپ کا خیال رکھوں گی"'
+        : 'Uses masculine forms: "میں بھیج رہا ہوں", "میں آپ کا خیال رکھوں گا"';
+
+    const personalityDesc = {
+        "Warm & Caring": "Speaks like a caring elder who genuinely cares about the patient's well-being",
+        "Professional": "Direct but polite — like a well-trained hospital receptionist",
+        "Friendly & Casual": "Light conversational tone to put patients at ease"
+    }[personalityLabel] || personalityLabel;
+
+    const styleDesc = {
+        "Formal": "Uses آپ, جناب, محترمہ — polite professional tone with dignity and courtesy",
+        "Casual": "Simple, conversational, everyday language — like talking to a friend",
+        "Native": "Rich Urdu with natural idioms, cultural expressions, and colloquial phrases — warm and authentic"
+    }[styleLabel] || styleLabel;
+
+    const genderVerbExample = gender === "F"
+        ? '<span style="color:var(--primary)">میں بھیج رہی ہوں</span> (feminine verb endings)'
+        : '<span style="color:var(--primary)">میں بھیج رہا ہوں</span> (masculine verb endings)';
+
+    document.getElementById("agentSummaryDesc").innerHTML =
+        `<div style="display:flex;flex-direction:column;gap:6px;font-style:normal;font-size:12px;line-height:1.4;">` +
+        `<div><strong>1. Persona</strong> "${name}" → prompt: <em>"Your name is ${name}"</em>, grammar: ${genderVerbExample}, voice: <strong>${ttsVoice}</strong></div>` +
+        `<div><strong>2. Personality</strong> → <span style="color:var(--primary)">${personalityLabel}</span>: "${personalityDesc}"</div>` +
+        `<div><strong>3. Style</strong> → <span style="color:var(--primary)">${styleLabel}</span>: "${styleDesc}"</div>` +
+        `</div>`;
+}
+
+function updateModelProfile() {
+    const sttModel = document.getElementById("sttModel").value;
+    const llmModel = document.getElementById("llmModel").value;
+    const ttsModel = document.getElementById("ttsModel").value;
+
+    function renderTags(info, elId, colorClass) {
+        const el = document.getElementById(elId);
+        if (!el || !info) { if (el) el.innerHTML = ""; return; }
+        el.innerHTML = (info.traits || []).map(t =>
+            `<span class="model-tag ${colorClass}">${t}</span>`
+        ).join("");
+    }
+
+    renderTags(MODEL_INFO.stt[sttModel], "sttModelTags", "stt");
+    renderTags(MODEL_INFO.llm[llmModel], "llmModelTags", "llm");
+    renderTags(MODEL_INFO.tts[ttsModel], "ttsModelTags", "tts");
+    updatePricingTable();
+}
+
+// ── Pricing Data (cost per 1-min interaction) ──
+const PRICING = {
+    stt: { "Deepgram Nova-3": 0.00770, "OpenAI Realtime": 0.00600 },
+    llm: { "gpt-4o-mini": 0.00015, "gpt-3.5-turbo": 0.00050, "gpt-4o": 0.00250, "gpt-4-turbo": 0.01000, "claude-haiku-4-5-20251001": 0.00100, "claude-sonnet-4-6-20250514": 0.00300 },
+    tts: { "tts-1": 0.01500, "tts-1-hd": 0.03000, "eleven_flash_v2_5": 0.06000, "eleven_turbo_v2_5": 0.06000, "eleven_multilingual_v2": 0.12000 }
+};
+const TTS_LABELS = { "tts-1":"TTS-1", "tts-1-hd":"TTS-1-HD", "eleven_flash_v2_5":"EL Flash", "eleven_turbo_v2_5":"EL Turbo", "eleven_multilingual_v2":"EL Multi v2" };
+const LLM_LABELS = { "gpt-4o-mini":"4o-mini", "gpt-3.5-turbo":"3.5T", "gpt-4o":"4o", "gpt-4-turbo":"4T", "claude-haiku-4-5-20251001":"Haiku", "claude-sonnet-4-6-20250514":"Sonnet" };
+const STT_LABELS = { "Deepgram Nova-3":"Deepgram", "OpenAI Realtime":"OpenAI RT" };
+
+// Monthly minutes: 8h×5d×4w = 9600min, 24h×7d×4w = 40320min (~2 interactions/min)
+const MONTHLY_8x5 = 9600;  // 8hrs/day, 5 days/week, 4 weeks
+const MONTHLY_24x7 = 40320; // 24hrs/day, 7 days/week, 4 weeks
+const TTS_CACHE_HIT_RATE = 0.85; // 85% hit rate after ~10 patients (normalized text cache, steady state)
+
+function fmtMoney(v) { return v < 10 ? "$" + v.toFixed(2) : "$" + Math.round(v); }
+
+function calcCached(sttCost, llmCost, ttsCost) {
+    // With TTS caching, only (1 - cache_hit_rate) of TTS calls hit the API
+    return sttCost + llmCost + (ttsCost * (1 - TTS_CACHE_HIT_RATE));
+}
+
+function updatePricingTable() {
+    const curSTT = document.getElementById("sttModel").value;
+    const curLLM = document.getElementById("llmModel").value;
+    const curTTS = document.getElementById("ttsModel").value;
+    const sc = PRICING.stt[curSTT]||0, lc = PRICING.llm[curLLM]||0, tc = PRICING.tts[curTTS]||0;
+    const curTotal = sc + lc + tc;
+    const curCached = calcCached(sc, lc, tc);
+    const savings = curTotal > 0 ? Math.round((1 - curCached / curTotal) * 100) : 0;
+
+    // Current selection summary
+    const curEl = document.getElementById("pricingCurrent");
+    if (curEl) {
+        const m8x5 = curTotal * MONTHLY_8x5;
+        const m24x7 = curTotal * MONTHLY_24x7;
+        const cm8x5 = curCached * MONTHLY_8x5;
+        const cm24x7 = curCached * MONTHLY_24x7;
+        const sv8x5 = m8x5 - cm8x5;
+        const sv24x7 = m24x7 - cm24x7;
+        curEl.innerHTML = `<strong>Current:</strong> ${STT_LABELS[curSTT]||curSTT} + ${LLM_LABELS[curLLM]||curLLM} + ${TTS_LABELS[curTTS]||curTTS}<br>` +
+            `<span style="color:var(--primary); font-weight:700;">$${curTotal.toFixed(4)}/min</span> &nbsp;→&nbsp; ` +
+            `<span style="color:#22c55e; font-weight:700;">$${curCached.toFixed(4)}/min with cache (−${savings}%)</span><br>` +
+            `<span style="color:#10b981;">8h×5d: ${fmtMoney(m8x5)} → ${fmtMoney(cm8x5)}</span> <span style="color:#22c55e; font-size:11px;">(save ${fmtMoney(sv8x5)}/mo)</span> &nbsp;|&nbsp; ` +
+            `<span style="color:#f59e0b;">24×7: ${fmtMoney(m24x7)} → ${fmtMoney(cm24x7)}</span> <span style="color:#22c55e; font-size:11px;">(save ${fmtMoney(sv24x7)}/mo)</span>`;
+    }
+
+    // Build all combos
+    const combos = [];
+    for (const [stt, sc2] of Object.entries(PRICING.stt))
+        for (const [llm, lc2] of Object.entries(PRICING.llm))
+            for (const [tts, tc2] of Object.entries(PRICING.tts)) {
+                const total = sc2 + lc2 + tc2;
+                const cached = calcCached(sc2, lc2, tc2);
+                combos.push({ stt, llm, tts, total, cached });
+            }
+    combos.sort((a, b) => a.total - b.total);
+
+    const tbody = document.getElementById("pricingTableBody");
+    if (!tbody) return;
+    tbody.innerHTML = combos.map((c, i) => {
+        const isCurrent = c.stt === curSTT && c.llm === curLLM && c.tts === curTTS;
+        const costClass = c.total < 0.02 ? "cost-low" : c.total < 0.07 ? "cost-mid" : "cost-high";
+        const cachedClass = c.cached < 0.02 ? "cost-low" : c.cached < 0.07 ? "cost-mid" : "cost-high";
+        const m8x5 = c.total * MONTHLY_8x5;
+        const m24x7 = c.total * MONTHLY_24x7;
+        const cm8x5 = c.cached * MONTHLY_8x5;
+        const cm24x7 = c.cached * MONTHLY_24x7;
+        const sav = c.total > 0 ? Math.round((1 - c.cached / c.total) * 100) : 0;
+        const sv8x5 = m8x5 - cm8x5;
+        const sv24x7 = m24x7 - cm24x7;
+        return `<tr class="${isCurrent ? 'current-combo' : ''}">
+            <td>${i + 1}</td>
+            <td>${STT_LABELS[c.stt]}</td>
+            <td>${LLM_LABELS[c.llm]}</td>
+            <td>${TTS_LABELS[c.tts]}</td>
+            <td class="cost-cell ${costClass}">$${c.total.toFixed(4)}</td>
+            <td class="cost-cell ${cachedClass}" style="font-weight:600;">$${c.cached.toFixed(4)}</td>
+            <td style="color:#22c55e; font-size:11px; font-weight:600;">−${sav}%</td>
+            <td class="cost-cell" style="color:#64748b;">${fmtMoney(m8x5)}</td>
+            <td class="cost-cell" style="color:#10b981; font-weight:600;">${fmtMoney(cm8x5)}</td>
+            <td class="cost-cell" style="color:#22c55e; font-size:10px;">−${fmtMoney(sv8x5)}</td>
+            <td class="cost-cell" style="color:#64748b;">${fmtMoney(m24x7)}</td>
+            <td class="cost-cell" style="color:#f59e0b; font-weight:600;">${fmtMoney(cm24x7)}</td>
+            <td class="cost-cell" style="color:#22c55e; font-size:10px;">−${fmtMoney(sv24x7)}</td>
+        </tr>`;
+    }).join("");
+}
+
+function renderTTSModels(provider, selectedModel) {
+    const models = TTS_MODELS[provider] || [];
+    const sel = document.getElementById("ttsModel");
+    sel.innerHTML = models.map(m => {
+        const selected = m.value === selectedModel ? " selected" : "";
+        return `<option value="${m.value}"${selected}>${m.label}</option>`;
+    }).join("");
+    // If no match, select first (default)
+    if (!selectedModel || !models.find(m => m.value === selectedModel)) {
+        if (models.length > 0) sel.value = models[0].value;
+    }
+}
+
+function updateTTSProvider(provider) {
+    updateSetting("tts_provider", provider);
+    const defaultModel = TTS_MODELS[provider]?.[0]?.value || "";
+    renderTTSModels(provider, defaultModel);
+    updateSetting("tts_model", defaultModel);
+    refreshVoicesForGender();
+    updateModelProfile();
+}
+
+const RTL_LANGUAGES = ["Urdu", "Arabic", "Punjabi"];
+
+function updateConversationDirection() {
+    const lang = document.getElementById("sttLang").value;
+    const conv = document.getElementById("conversation");
+    const sttLive = document.getElementById("sttLive");
+    const isRtl = RTL_LANGUAGES.includes(lang);
+    conv.classList.toggle("rtl", isRtl);
+    conv.classList.toggle("ltr", !isRtl);
+    sttLive.classList.toggle("rtl", isRtl);
+    sttLive.classList.toggle("ltr", !isRtl);
+    document.getElementById("convLangBadge").textContent = "🗣 " + lang;
+}
+
+function onVoiceChange(voiceName) {
+    updateSetting("tts_voice", voiceName);
+}
+
+function toggleSection(header, bodyId) {
+    const body = document.getElementById(bodyId);
+    const isOpen = header.classList.contains("open");
+    if (isOpen) {
+        body.style.maxHeight = body.scrollHeight + "px";
+        requestAnimationFrame(() => {
+            header.classList.remove("open");
+            body.classList.add("collapsed");
+        });
+    } else {
+        body.classList.remove("collapsed");
+        body.style.maxHeight = body.scrollHeight + "px";
+        header.classList.add("open");
+        setTimeout(() => { body.style.maxHeight = "none"; }, 300);
+    }
+}
+
+
+
+function renderDoctors(doctors) {
+    _allDoctors = doctors;
+    const grid = document.getElementById("doctorsGrid");
+    grid.innerHTML = doctors.map((d, i) => {
+        const initials = d.name.replace("Dr. ", "").split(" ").map(w => w[0]).join("");
+        const gIcon = d.gender === "F" ? "👩‍⚕️" : "👨‍⚕️";
+        return `
+        <div class="doctor-row ${d.available ? '' : 'unavailable'}" onclick="showDoctorDetail(${i})" style="cursor:pointer;">
+            <div class="doctor-avatar">${initials}</div>
+            <div class="doctor-info">
+                <div class="doctor-name">${gIcon} ${d.name}</div>
+                <div class="doctor-spec">${d.specialty}</div>
+            </div>
+            <div class="doctor-room">Room ${d.room}</div>
+            <div class="doctor-status ${d.available ? 'online' : 'offline'}"></div>
+        </div>`;
+    }).join("");
+}
+
+function showDoctorDetail(index) {
+    const d = _allDoctors[index];
+    if (!d) return;
+    const initials = d.name.replace("Dr. ", "").split(" ").map(w => w[0]).join("");
+    const avatarEl = document.getElementById("detailAvatar");
+    avatarEl.textContent = initials;
+    avatarEl.className = "detail-avatar " + (d.gender === "F" ? "female" : "male");
+
+    document.getElementById("detailName").textContent = d.name;
+    document.getElementById("detailSpec").textContent = d.specialty;
+
+    const statusEl = document.getElementById("detailStatus");
+    statusEl.textContent = d.available ? "Available" : "Unavailable";
+    statusEl.className = "detail-status " + (d.available ? "online" : "offline");
+
+    document.getElementById("detailQual").textContent = d.qualification || "-";
+    document.getElementById("detailExp").textContent = d.experience || "-";
+    document.getElementById("detailRoom").textContent = "Room " + d.room;
+    document.getElementById("detailTime").textContent = d.timings || "-";
+    document.getElementById("detailPhone").textContent = d.phone || "-";
+    document.getElementById("detailLang").textContent = (d.languages || []).join(", ");
+
+    const expertiseEl = document.getElementById("detailExpertise");
+    const expertiseItems = (d.expertise || "").split(",").map(s => s.trim()).filter(Boolean);
+    expertiseEl.innerHTML = expertiseItems.map(e => `<span class="tag">${e}</span>`).join("");
+
+    // Highlight selected row
+    document.querySelectorAll(".doctor-row").forEach((r, i) => {
+        r.style.borderColor = i === index ? "var(--primary-light)" : "";
+        r.style.background = i === index ? "var(--surface-2)" : "";
+    });
+
+    const detail = document.getElementById("doctorDetail");
+    detail.classList.add("active");
+    const qrBody = document.getElementById("quickRefBody");
+    const qrHeader = document.querySelector("#quickRefCard .collapsible-toggle");
+    qrBody.style.maxHeight = qrBody.scrollHeight + "px";
+    requestAnimationFrame(() => {
+        qrHeader.classList.remove("open");
+        qrBody.classList.add("collapsed");
+    });
+    detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function closeDoctorDetail() {
+    document.getElementById("doctorDetail").classList.remove("active");
+    const qrBody = document.getElementById("quickRefBody");
+    const qrHeader = document.querySelector("#quickRefCard .collapsible-toggle");
+    qrBody.classList.remove("collapsed");
+    qrBody.style.maxHeight = qrBody.scrollHeight + "px";
+    qrHeader.classList.add("open");
+    setTimeout(() => { qrBody.style.maxHeight = "none"; }, 300);
+    document.querySelectorAll(".doctor-row").forEach(r => {
+        r.style.borderColor = "";
+        r.style.background = "";
+    });
+}
+
+function restoreState(state) {
+    if (state.doctors) renderDoctors(state.doctors);
+    if (state.disease_clusters) initTriageDashboard(state.disease_clusters);
+    if (state.status) setStatus(state.status);
+    if (state.conversation) {
+        clearConversation();
+        state.conversation.forEach(m => addMessage(m.role, m.text));
+    }
+    // Restore patient data and triage scoring if session is active
+    if (state.patient_data) {
+        updatePatientScreening(state.patient_data);
+        computeClustersClientSide(state.patient_data);
+        console.log("[Triage] Restored patient data from state:", state.patient_data);
+    }
+    // Lock settings if a session is active
+    if (state.recording) lockSettings();
+    if (state.config) {
+        document.getElementById("sttModel").value = state.config.stt_model;
+        document.getElementById("sttLang").value = state.config.stt_language;
+        document.getElementById("llmModel").value = state.config.llm_model;
+        document.getElementById("ttsProvider").value = state.config.tts_provider;
+        renderTTSModels(state.config.tts_provider, state.config.tts_model);
+        if (state.config.voice_gender) {
+            _selectedGender = state.config.voice_gender;
+        }
+        if (state.config.agent_name) {
+            const persona = AGENT_PERSONAS.find(p => p.name === state.config.agent_name);
+            if (persona) {
+                document.getElementById("agentPersona").value = persona.name;
+                _selectedGender = persona.gender;
+            }
+        }
+        if (state.config.personality) {
+            document.getElementById("agentPersonality").value = state.config.personality;
+        }
+        if (state.config.lang_style) {
+            document.getElementById("agentLangStyle").value = state.config.lang_style;
+        }
+        const filtered = getFilteredVoices();
+        renderVoiceOptions(filtered, state.config.tts_voice);
+        updateAgentProfileSummary();
+        updateModelProfile();
+        updateConversationDirection();
+    }
+}
+
+// Initialize on page load — render defaults, then connectWS will restore saved state
+let _initDone = false;
+renderAgentPersonas("Amina");
+// Don't call refreshVoicesForGender() here — it sends settings and overwrites saved state.
+// restoreState (from WS) will set the correct voices and models.
+const initVoices = getFilteredVoices();
+if (initVoices.length > 0) renderVoiceOptions(initVoices, initVoices[0].name);
+renderTTSModels("OpenAI", "tts-1");
+updateAgentProfileSummary();
+updateModelProfile();
+updateConversationDirection();
+connectWS();
+
+// ── Patient Screening ──
+let currentPatientData = null;
+
+// Symptom-to-vitals mapping: built from disease_clusters.json (single source of truth)
+// Initialized on page load from server state, fallback to defaults
+let SYMPTOM_VITALS_MAP = {};
+
+function buildSymptomVitalsMap(clustersData) {
+    // Build SYMPTOM_VITALS_MAP from disease_clusters.json — same data drives bot + dashboard + screening UI
+    // Filters out non-definitive vitals ("possible", "check") — only include vitals the bot should actively ask
+    if (!clustersData || !clustersData.clusters) return;
+    const vitalKeyToField = {
+        temperature: "scrTemperature", fever: "scrFever",
+        bp: "scrBP", heart_rate: "scrHeartRate",
+        sugar_level: "scrSugarLevel", mobility: "scrMobility",
+    };
+    const EXCLUDE_VALUES = new Set(["possible", "check"]);
+    const newMap = {};
+    for (const cluster of clustersData.clusters) {
+        const symptoms = new Set();
+        const fields = new Set();
+        for (const cond of (cluster.conditions || [])) {
+            for (const sym of (cond.symptoms || [])) symptoms.add(sym.toLowerCase());
+            const severities = new Set(cond.severity || []);
+            // Skip vitals from mild-only conditions
+            if (severities.size === 1 && severities.has("mild")) continue;
+            for (const [vk, vval] of Object.entries(cond.vitals || {})) {
+                if (vitalKeyToField[vk] && !EXCLUDE_VALUES.has(vval)) {
+                    fields.add(vitalKeyToField[vk]);
+                }
+            }
+        }
+        if (fields.size === 0) fields.add("scrSeverity");
+        newMap[[...symptoms].join(",")] = [...fields];
+    }
+    SYMPTOM_VITALS_MAP = newMap;
+}
+
+function getRelevantVitals(symptoms) {
+    if (!symptoms || (Array.isArray(symptoms) && symptoms.length === 0)) return [];
+    const symStr = (Array.isArray(symptoms) ? symptoms.join(" ") : symptoms).toLowerCase();
+    const relevant = new Set();
+    for (const [keywords, vitals] of Object.entries(SYMPTOM_VITALS_MAP)) {
+        for (const kw of keywords.split(",")) {
+            if (symStr.includes(kw.trim())) {
+                vitals.forEach(v => relevant.add(v));
+                break;
+            }
+        }
+    }
+    // Always include duration and severity as base
+    return [...relevant];
+}
+
+// All optional vital field IDs
+const ALL_VITAL_IDS = ["scrFever", "scrBP", "scrHeartRate", "scrTemperature", "scrSugarLevel", "scrMobility"];
+
+function updateFlowStepper(data) {
+    const steps = {
+        flowName: !!data.name && data.name !== "null",
+        flowSymptoms: Array.isArray(data.symptoms) ? data.symptoms.length > 0 : !!data.symptoms,
+        flowDuration: !!data.duration && data.duration !== "null",
+        flowRefer: !!data.referred_doctor,
+    };
+
+    // Determine which vitals are relevant based on symptoms
+    const relevantVitals = getRelevantVitals(data.symptoms);
+    const vitalLabel = document.getElementById("flowVitalLabel");
+
+    // Update vitals label — show relevant vital names or default "Vitals"
+    if (relevantVitals.length > 0 && steps.flowSymptoms) {
+        const vitalNames = relevantVitals.map(id => {
+            const el = document.getElementById(id);
+            return el ? el.closest(".screening-field").querySelector("label").textContent : "";
+        }).filter(Boolean);
+        vitalLabel.textContent = vitalNames.join(", ");
+    } else {
+        vitalLabel.textContent = "Vitals";
+    }
+
+    // Check if vital data collected
+    const v = data.vitals || {};
+    const vitalCollected = relevantVitals.some(id => {
+        if (id === "scrFever") return v.fever || data.fever;
+        if (id === "scrBP") return v.bp || data.bp;
+        if (id === "scrHeartRate") return v.heart_rate;
+        if (id === "scrTemperature") return v.temperature;
+        if (id === "scrSugarLevel") return v.sugar_level;
+        if (id === "scrMobility") return v.mobility;
+        return false;
+    });
+    steps.flowVital = vitalCollected;
+
+    const flowComplete = !!(data.is_complete || data.referred_doctor);
+
+    // If flow is complete, mark all steps done except Vital which depends on whether it was collected
+    if (flowComplete) {
+        steps.flowName = true;
+        steps.flowSymptoms = true;
+        steps.flowDuration = true;
+        steps.flowRefer = true;
+        // steps.flowVital stays as-is — true if collected, false if skipped
+    }
+
+    // Determine current active step
+    const order = ["flowName", "flowSymptoms", "flowDuration", "flowVital", "flowRefer"];
+
+    let activeSet = false;
+    for (const stepId of order) {
+        const el = document.getElementById(stepId);
+        if (!el) continue;
+        el.classList.remove("done", "active", "skipped");
+        if (steps[stepId]) {
+            el.classList.add("done");
+        } else if (flowComplete && stepId === "flowVital") {
+            // Vital was skipped but flow completed — show yellow (skipped)
+            el.classList.add("skipped");
+        } else if (!activeSet) {
+            el.classList.add("active");
+            activeSet = true;
+        }
+    }
+
+    // Show/hide vitals in screening grid based on relevance
+    ALL_VITAL_IDS.forEach(id => {
+        const field = document.getElementById(id)?.closest(".screening-field");
+        if (!field) return;
+        if (relevantVitals.includes(id)) {
+            field.classList.remove("hidden-vital");
+        } else {
+            // Hide if no data and not relevant
+            const el = document.getElementById(id);
+            if (el && el.textContent === "—") {
+                field.classList.add("hidden-vital");
+            }
+        }
+    });
+
+    // Highlight next-ask vitals (relevant but not yet collected)
+    ALL_VITAL_IDS.forEach(id => {
+        const field = document.getElementById(id)?.closest(".screening-field");
+        if (!field) return;
+        const el = document.getElementById(id);
+        field.classList.remove("next-ask", "collected");
+        if (!relevantVitals.includes(id)) return;
+        if (el && el.textContent !== "—") {
+            field.classList.add("collected");
+        } else if (steps.flowDuration && !vitalCollected) {
+            field.classList.add("next-ask");
+        }
+    });
+
+    // Also mark duration and severity fields
+    const durField = document.getElementById("scrDuration")?.closest(".screening-field");
+    const sevField = document.getElementById("scrSeverity")?.closest(".screening-field");
+    if (durField) {
+        durField.classList.remove("next-ask", "collected");
+        if (data.duration && data.duration !== "null") durField.classList.add("collected");
+        else if (steps.flowSymptoms && !steps.flowDuration) durField.classList.add("next-ask");
+    }
+    if (sevField) {
+        sevField.classList.remove("next-ask", "collected");
+        if (data.severity) sevField.classList.add("collected");
+        else if (relevantVitals.includes("scrSeverity") && steps.flowDuration) sevField.classList.add("next-ask");
+    }
+}
+
+let _lastPatientDataJSON = "";
+let _autoEndTriggered = false;
+function updatePatientScreening(data) {
+    // Deduplicate — skip if identical to last update (prevents flickering)
+    const dataJSON = JSON.stringify(data);
+    if (dataJSON === _lastPatientDataJSON) return;
+    _lastPatientDataJSON = dataJSON;
+
+    currentPatientData = data;
+    const card = document.getElementById("patientScreeningCard");
+    card.style.display = "";
+
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const newText = val || "—";
+        if (el.textContent !== newText) {
+            el.textContent = newText;
+            if (newText !== "—") {
+                el.classList.add("field-updated");
+                setTimeout(() => { el.classList.remove("field-updated"); }, 1500);
+            }
+        }
+    };
+    set("scrName", data.name);
+    set("scrAge", data.age);
+    set("scrGender", data.gender === "M" ? "Male" : data.gender === "F" ? "Female" : data.gender);
+    set("scrVisit", data.visit_type);
+    set("scrSymptoms", Array.isArray(data.symptoms) ? data.symptoms.join(", ") : data.symptoms);
+    set("scrDuration", data.duration);
+    set("scrSeverity", data.severity ? data.severity : null);
+    const v = data.vitals || {};
+    set("scrFever", v.fever || data.fever);
+    set("scrBP", v.bp || data.bp);
+    set("scrHeartRate", v.heart_rate);
+    set("scrTemperature", v.temperature);
+    set("scrSugarLevel", v.sugar_level);
+    set("scrMobility", v.mobility);
+    set("scrNotes", data.follow_up_notes);
+
+    // Update flow stepper and vital highlighting
+    updateFlowStepper(data);
+
+    const refSection = document.getElementById("scrReferralSection");
+    const printBtn = document.getElementById("printSlipBtn");
+    if (data.referred_doctor) {
+        refSection.style.display = "";
+        const refText = data.referred_doctor + (data.referred_dept ? " — " + data.referred_dept : "") +
+            (data.referred_room ? " (" + data.referred_room + ")" : "");
+        const refEl = document.getElementById("scrReferred");
+        if (refEl.textContent !== refText) {
+            refEl.innerHTML = `<a href="#" onclick="event.preventDefault(); openReferredDoctor('${data.referred_doctor.replace(/'/g, "\\'")}')" style="color:var(--primary); text-decoration:underline; cursor:pointer;">${refText}</a>`;
+            // Only auto-open doctor on first referral, not on subsequent updates
+            openReferredDoctor(data.referred_doctor);
+        }
+        printBtn.style.display = "";
+    } else {
+        refSection.style.display = "none";
+        printBtn.style.display = "none";
+    }
+
+}
+
+function openReferredDoctor(doctorName) {
+    if (!_allDoctors || !_allDoctors.length) return;
+    const idx = _allDoctors.findIndex(d => d.name && doctorName && d.name.toLowerCase().includes(doctorName.replace("Dr. ", "").toLowerCase()));
+    if (idx === -1) return;
+    // Switch to hospital tab
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.right-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-hospital').classList.add('active');
+    document.querySelector('.right-tab').classList.add('active');
+    // Open doctor detail
+    showDoctorDetail(idx);
+}
+
+function resetPatientScreening() {
+    currentPatientData = null;
+    document.getElementById("printSlipBtn").style.display = "none";
+    document.getElementById("scrReferralSection").style.display = "none";
+    ["scrName","scrAge","scrGender","scrVisit","scrSymptoms","scrDuration","scrSeverity","scrFever","scrBP","scrHeartRate","scrTemperature","scrSugarLevel","scrMobility","scrNotes"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = "—";
+            const field = el.closest(".screening-field");
+            if (field) field.classList.remove("next-ask", "collected", "hidden-vital");
+        }
+    });
+    // Reset flow stepper
+    ["flowName","flowSymptoms","flowDuration","flowVital","flowRefer"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("done", "active", "skipped");
+    });
+    document.getElementById("flowName")?.classList.add("active");
+    document.getElementById("flowVitalLabel").textContent = "Vitals";
+}
+
+function printSlip() {
+    if (!currentPatientData) return;
+    const d = currentPatientData;
+    const now = new Date();
+    const date = now.toLocaleDateString("en-PK", { year: "numeric", month: "short", day: "numeric" });
+    const time = now.toLocaleTimeString("en-PK", { hour: "2-digit", minute: "2-digit" });
+    const token = "T-" + now.getFullYear() + String(now.getMonth()+1).padStart(2,"0") + String(now.getDate()).padStart(2,"0") + "-" + String(Math.floor(Math.random()*9000)+1000);
+
+    const rows = [
+        ["Patient Name", d.name],
+        ["Age", d.age],
+        ["Gender", d.gender === "M" ? "Male" : d.gender === "F" ? "Female" : d.gender],
+        ["Symptoms", Array.isArray(d.symptoms) ? d.symptoms.join(", ") : d.symptoms],
+        ["Duration", d.duration],
+        ["Severity", d.severity || null],
+        ["Fever", (d.vitals||{}).fever || d.fever],
+        ["Blood Pressure", (d.vitals||{}).bp || d.bp],
+        ["Heart Rate", (d.vitals||{}).heart_rate],
+        ["Temperature", (d.vitals||{}).temperature],
+        ["Sugar Level", (d.vitals||{}).sugar_level],
+        ["Mobility", (d.vitals||{}).mobility],
+        ["Notes", d.follow_up_notes],
+    ].filter(r => r[1] && r[1] !== "null").map(r =>
+        `<div class="slip-row"><span class="slip-label">${r[0]}</span><span class="slip-value">${r[1]}</span></div>`
+    ).join("");
+
+    const overlay = document.getElementById("printSlipOverlay");
+    document.getElementById("slipContent").innerHTML = `
+        <div class="slip-header">
+            <h2>${HOSPITAL_NAME || "City General Hospital"}</h2>
+            <p>Patient Referral Slip</p>
+            <p style="margin-top:6px;font-size:12px;color:#333;"><strong>Token: ${token}</strong> &nbsp;|&nbsp; ${date} &nbsp;|&nbsp; ${time}</p>
+        </div>
+        <div class="slip-body">
+            ${rows}
+            <div class="slip-referral">
+                <div class="doctor">${d.referred_doctor || "—"}</div>
+                <div class="dept">${d.referred_dept || ""}</div>
+                <div class="room">${d.referred_room || ""}</div>
+            </div>
+        </div>
+        <div class="slip-footer">AI-assisted screening — This is not a medical diagnosis<br>Generated by AI Clinical Triage System</div>
+        <div class="slip-actions">
+            <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+            <button class="btn-close" onclick="document.getElementById('printSlipOverlay').classList.remove('active')">Close</button>
+        </div>
+    `;
+    overlay.classList.add("active");
+}
+
+const HOSPITAL_NAME_UI = "City General Hospital";
+
+// ── Triage Dashboard ──
+let _diseaseClusters = null;
+let _lastClusterJSON = "";
+let _expandedCluster = null;
+let _triageAutoSwitched = false;
+let _symptomUrduMap = {};  // English symptom → first Urdu alias (built once at init)
+
+function _buildSymptomUrduMap(aliases) {
+    // Build reverse lookup: English symptom name → first Urdu alias
+    // Built once at startup, used for hover tooltips on triage tags
+    const map = {};
+    const urduRegex = /[\u0600-\u06FF]/;
+    for (const [canonical, aliasList] of Object.entries(aliases)) {
+        const urduAliases = aliasList.filter(a => urduRegex.test(a));
+        const firstUrdu = urduAliases.length > 0 ? urduAliases[0] : "";
+        if (firstUrdu) {
+            map[canonical.toLowerCase()] = firstUrdu;
+            // Also map each English alias to the same Urdu
+            for (const a of aliasList) {
+                if (!urduRegex.test(a)) {
+                    map[a.toLowerCase()] = firstUrdu;
+                }
+            }
+        }
+    }
+    return map;
+}
+
+function initTriageDashboard(clustersData) {
+    if (!clustersData || !clustersData.clusters) return;
+    _diseaseClusters = clustersData;
+    if (clustersData.symptom_aliases) {
+        _symptomUrduMap = _buildSymptomUrduMap(clustersData.symptom_aliases);
+    }
+    buildSymptomVitalsMap(clustersData);
+    // Render initial state (all departments, no scores)
+    renderClusterCards(clustersData.clusters.map(c => ({
+        department: c.department,
+        doctor: c.doctor,
+        room: c.room,
+        icon: c.icon || "🏥",
+        score: 0,
+        matched_symptoms: [],
+        top_conditions: (c.conditions || []).map(cond => ({
+            name: cond.name, icd: cond.icd, score: 0, matched: [],
+            symptoms: cond.symptoms || [], vitals: cond.vitals || {}, severity: cond.severity || [],
+        })),
+    })));
+}
+
+function computeClustersClientSide(patientData) {
+    // Client-side cluster scoring — runs immediately on patient_data update
+    if (!_diseaseClusters || !_diseaseClusters.clusters) {
+        console.warn("[Triage] computeClustersClientSide: _diseaseClusters not initialized");
+        return;
+    }
+    const symptoms = patientData.symptoms || [];
+    if (!symptoms.length || (symptoms.length === 1 && !symptoms[0])) {
+        // No symptoms yet — show initial state
+        initTriageDashboard(_diseaseClusters);
+        return;
+    }
+    const vitals = patientData.vitals || {};
+    const severity = patientData.severity || "";
+    const aliases = _diseaseClusters.symptom_aliases || {};
+
+    // Expand symptoms with aliases
+    const symLower = symptoms.map(s => (s || "").toLowerCase().trim()).filter(Boolean);
+    const expanded = new Set(symLower);
+    for (const [canonical, aliasList] of Object.entries(aliases)) {
+        const cl = canonical.toLowerCase();
+        for (const alias of aliasList) {
+            const al = alias.toLowerCase();
+            if (expanded.has(al)) expanded.add(cl);
+            if (expanded.has(cl)) expanded.add(al);
+        }
+    }
+
+    const results = _diseaseClusters.clusters.map(cluster => {
+        let clusterMatched = new Set();
+        const condScores = cluster.conditions.map(cond => {
+            const condSymptoms = (cond.symptoms || []).map(s => s.toLowerCase());
+            const matched = [];
+            for (const ps of expanded) {
+                for (const cs of condSymptoms) {
+                    if (ps.includes(cs) || cs.includes(ps)) {
+                        matched.push(cs);
+                        break;
+                    }
+                }
+            }
+            // Vital boost
+            let vitalBoost = 0;
+            if (cond.vitals) {
+                if (cond.vitals.fever && vitals.fever && !["", "no", "none"].includes((vitals.fever+"").toLowerCase())) vitalBoost += 0.1;
+                if (cond.vitals.bp && vitals.bp && (vitals.bp+"").trim()) vitalBoost += 0.1;
+                if (cond.vitals.heart_rate && vitals.heart_rate && (vitals.heart_rate+"").trim()) vitalBoost += 0.1;
+                if (cond.vitals.temperature && vitals.temperature && (vitals.temperature+"").trim()) vitalBoost += 0.1;
+                if (cond.vitals.sugar_level && vitals.sugar_level && (vitals.sugar_level+"").trim()) vitalBoost += 0.1;
+                if (cond.vitals.mobility && vitals.mobility && (vitals.mobility+"").trim()) vitalBoost += 0.1;
+            }
+            let sevBoost = 0;
+            if (severity && cond.severity && cond.severity.map(s => s.toLowerCase()).includes(severity.toLowerCase())) sevBoost = 0.05;
+
+            const score = (condSymptoms.length > 0 && matched.length > 0) ? Math.min(1.0, (matched.length / condSymptoms.length) + vitalBoost + sevBoost) : 0;
+            matched.forEach(m => clusterMatched.add(m));
+            return {
+                name: cond.name, icd: cond.icd, score: Math.round(score * 1000) / 1000,
+                matched: [...new Set(matched)],
+                symptoms: cond.symptoms || [], vitals: cond.vitals || {}, severity: cond.severity || [],
+            };
+        });
+        condScores.sort((a, b) => b.score - a.score);
+        const bestScore = condScores.length > 0 ? condScores[0].score : 0;
+        return {
+            department: cluster.department,
+            doctor: cluster.doctor,
+            room: cluster.room,
+            icon: cluster.icon || "🏥",
+            score: Math.round(bestScore * 1000) / 1000,
+            matched_symptoms: [...clusterMatched],
+            top_conditions: condScores,
+        };
+    });
+    results.sort((a, b) => b.score - a.score);
+    const topMatches = results.filter(r => r.score > 0);
+    if (topMatches.length > 0) {
+        console.log("[Triage] Client-side scores:", topMatches.map(r => r.department + ":" + Math.round(r.score*100) + "%").join(", "));
+    }
+    updateTriageDashboard(results);
+}
+
+function updateTriageDashboard(clusterScores) {
+    const json = JSON.stringify(clusterScores);
+    if (json === _lastClusterJSON) {
+        console.log("[Triage] updateTriageDashboard: dedup — same data, skipping render");
+        return;
+    }
+    _lastClusterJSON = json;
+
+    // Auto-switch to Triage tab on first symptom match
+    const hasMatch = clusterScores && clusterScores.some(c => c.score > 0);
+    const triageTab = document.getElementById("tab-triage");
+    if (hasMatch && triageTab && !triageTab.classList.contains("active") && !_triageAutoSwitched) {
+        _triageAutoSwitched = true;
+        const tabs = document.querySelectorAll('.right-tab');
+        switchTab('triage', tabs[1]);
+    }
+
+    renderClusterCards(clusterScores);
+}
+
+// Fast Urdu tooltip lookup — uses pre-built _symptomUrduMap (built once at init)
+function _getUrduTooltip(symptomName) {
+    return _symptomUrduMap[symptomName.toLowerCase()] || "";
+}
+
+function renderClusterCards(clusters) {
+    const container = document.getElementById("triageDashboard");
+    const empty = document.getElementById("triageEmpty");
+    const badge = document.getElementById("triageMatchBadge");
+    const subtitle = document.getElementById("triageSubtitle");
+    const statusEl = document.getElementById("triageStatus");
+
+    if (!clusters || clusters.length === 0) {
+        if (empty) empty.style.display = "";
+        return;
+    }
+    if (empty) empty.style.display = "none";
+
+    const hasScores = clusters.some(c => c.score > 0);
+    const matchCount = clusters.filter(c => c.score > 0).length;
+    const topScore = clusters[0]?.score || 0;
+
+    // Update header
+    if (hasScores) {
+        badge.textContent = matchCount + " match" + (matchCount !== 1 ? "es" : "");
+        badge.classList.add("has-match");
+        subtitle.textContent = "Narrowing to " + matchCount + " department" + (matchCount !== 1 ? "s" : "") + " — top match: " + Math.round(topScore * 100) + "%";
+        statusEl.textContent = matchCount + " departments matched";
+    } else {
+        badge.textContent = "0 matches";
+        badge.classList.remove("has-match");
+        subtitle.textContent = "All departments shown — speak to narrow focus";
+        statusEl.textContent = "Waiting for symptoms...";
+    }
+
+    // Build cards HTML
+    let html = "";
+    clusters.forEach((c, idx) => {
+        const pct = Math.round(c.score * 100);
+        const isTop = hasScores && idx === 0 && c.score > 0;
+        const isFaded = hasScores && c.score === 0;
+        const isExpanded = _expandedCluster === c.department;
+        const scoreClass = c.score >= 0.4 ? "top" : c.score >= 0.25 ? "high" : c.score >= 0.1 ? "mid" : "low";
+        const pctClass = c.score >= 0.4 ? "top" : c.score >= 0.25 ? "high" : "";
+
+        let cardClass = "cluster-card";
+        if (isTop) cardClass += " top-match";
+        if (isFaded) cardClass += " faded";
+        if (isExpanded) cardClass += " expanded";
+
+        // Matched symptoms tags
+        let matchedHTML = "";
+        if (c.matched_symptoms && c.matched_symptoms.length > 0) {
+            matchedHTML = '<div class="cluster-matched">' +
+                c.matched_symptoms.map(s => {
+                    const urdu = _getUrduTooltip(s);
+                    const tooltip = urdu ? ` title="${escapeHtml(urdu)}"` : "";
+                    return `<span class="cluster-matched-tag"${tooltip}>${escapeHtml(s)}</span>`;
+                }).join("") +
+                '</div>';
+        }
+
+        // Conditions list — show ALL conditions with full data from disease_clusters.json
+        let condHTML = "";
+        if (c.top_conditions && c.top_conditions.length > 0) {
+            condHTML = '<div class="condition-list">' +
+                c.top_conditions.map(cond => {
+                    const cpct = Math.round(cond.score * 100);
+                    const isHighlight = cond.score > 0;
+                    const matchedSet = new Set((cond.matched || []).map(m => m.toLowerCase()));
+
+                    // Symptoms pills — matched ones highlighted
+                    const symptomsHTML = (cond.symptoms && cond.symptoms.length > 0)
+                        ? '<div class="cond-symptoms">' +
+                          cond.symptoms.map(s => {
+                              const isMatched = matchedSet.has(s.toLowerCase()) ||
+                                  [...matchedSet].some(m => s.toLowerCase().includes(m) || m.includes(s.toLowerCase()));
+                              const urdu = _getUrduTooltip(s);
+                              const tooltip = urdu ? ` title="${escapeHtml(urdu)}"` : "";
+                              return `<span class="cond-sym-tag${isMatched ? ' matched' : ''}"${tooltip}>${escapeHtml(s)}</span>`;
+                          }).join("") + '</div>'
+                        : '';
+
+                    // Vitals tags
+                    const vitalsEntries = Object.entries(cond.vitals || {});
+                    const vitalsHTML = vitalsEntries.length > 0
+                        ? '<div class="cond-vitals">' +
+                          vitalsEntries.map(([k, v]) =>
+                              `<span class="cond-vital-tag"><b>${escapeHtml(k.replace('_', ' '))}:</b> ${escapeHtml(v)}</span>`
+                          ).join("") + '</div>'
+                        : '';
+
+                    // Severity badges
+                    const sevHTML = (cond.severity && cond.severity.length > 0)
+                        ? '<div class="cond-severity">' +
+                          cond.severity.map(s =>
+                              `<span class="cond-sev-tag ${s}">${s}</span>`
+                          ).join("") + '</div>'
+                        : '';
+
+                    return `<div class="condition-item${isHighlight ? ' highlight' : ''}">
+                        <div class="cond-header">
+                            <span class="condition-name">${escapeHtml(cond.name)}</span>
+                            <span class="condition-icd">${cond.icd}</span>
+                            <div class="condition-score-bar"><div class="condition-score-fill" style="width:${cpct}%"></div></div>
+                            <span class="condition-pct">${cpct > 0 ? cpct + '%' : ''}</span>
+                        </div>
+                        ${symptomsHTML}${vitalsHTML}${sevHTML}
+                    </div>`;
+                }).join("") +
+                '</div>';
+        }
+
+        html += `<div class="${cardClass}" data-dept="${c.department}">
+            <div class="cluster-card-header" onclick="toggleClusterCard('${c.department.replace(/'/g, "\\'")}')">
+                <span class="cluster-icon">${c.icon}</span>
+                <div class="cluster-info">
+                    <div class="cluster-dept">${c.department}</div>
+                    <div class="cluster-doctor">${c.doctor} · Room ${c.room}</div>
+                </div>
+                <div class="cluster-score-wrap">
+                    <div class="cluster-score-bar"><div class="cluster-score-fill ${scoreClass}" style="width:${pct}%"></div></div>
+                    <span class="cluster-pct ${pctClass}">${pct > 0 ? pct + '%' : '—'}</span>
+                </div>
+            </div>
+            <div class="cluster-card-body">
+                ${matchedHTML}
+                ${condHTML}
+            </div>
+        </div>`;
+    });
+
+    container.innerHTML = html;
+
+    // Auto-expand top match if it has score > 0
+    if (hasScores && clusters[0].score > 0 && !_expandedCluster) {
+        _expandedCluster = clusters[0].department;
+        const topCard = container.querySelector('.cluster-card.top-match');
+        if (topCard) topCard.classList.add('expanded');
+    }
+}
+
+function toggleClusterCard(dept) {
+    const container = document.getElementById("triageDashboard");
+    const cards = container.querySelectorAll('.cluster-card');
+    cards.forEach(card => {
+        if (card.dataset.dept === dept) {
+            card.classList.toggle('expanded');
+            _expandedCluster = card.classList.contains('expanded') ? dept : null;
+        } else {
+            card.classList.remove('expanded');
+        }
+    });
+}
+
+// Reset triage on new session
+function resetTriageDashboard() {
+    _lastClusterJSON = "";
+    _expandedCluster = null;
+    _triageAutoSwitched = false;
+    if (_diseaseClusters) {
+        initTriageDashboard(_diseaseClusters);
+    }
+}
+</script>
+
+<!-- Print Slip Overlay -->
+<div class="slip-overlay" id="printSlipOverlay">
+    <div class="slip-content" id="slipContent"></div>
+</div>
+
+</body>
+</html>

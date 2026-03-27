@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-Time STT Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9;
+    --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+    --border: #e2e8f0; --border-light: #f1f5f9;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --radius: 12px; --radius-lg: 16px;
+    --dg: #3b82f6; --dg-bg: #eff6ff; --dg-border: #bfdbfe;
+    --sx: #ec4899; --sx-bg: #fdf2f8; --sx-border: #fbcfe8;
+    --gc: #22c55e; --gc-bg: #f0fdf4; --gc-border: #bbf7d0;
+    --wh: #f59e0b; --wh-bg: #fffbeb; --wh-border: #fde68a;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
+    color: white; padding: 20px 32px; display: flex; align-items: center;
+    justify-content: space-between; box-shadow: 0 4px 20px rgba(30,64,175,0.2);
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-icon {
+    width: 44px; height: 44px; background: rgba(255,255,255,0.15); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.header-title { font-size: 20px; font-weight: 700; }
+.header-subtitle { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+.provider-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.provider-badge {
+    padding: 4px 12px; border-radius: 16px; font-size: 11px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.12);
+}
+
+/* Main layout */
+.main { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+
+/* Config bar */
+.config-bar {
+    background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+    border: 1px solid var(--border); padding: 16px 20px; margin-bottom: 16px;
+    display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+}
+.config-group { display: flex; flex-direction: column; gap: 4px; }
+.config-group label {
+    font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.config-group select {
+    padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 13px; font-family: inherit; background: var(--surface);
+    cursor: pointer; min-width: 140px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5l-5-5h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+}
+.config-group select:focus { outline: none; border-color: var(--dg); }
+
+/* Provider toggles */
+.toggle-group { display: flex; gap: 8px; align-items: center; }
+.toggle {
+    display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+    border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1.5px solid var(--border); background: var(--surface);
+    transition: all 0.15s ease; user-select: none;
+}
+.toggle.active { border-color: currentColor; }
+.toggle.dg { color: var(--dg); } .toggle.dg.active { background: var(--dg-bg); border-color: var(--dg); }
+.toggle.sx { color: var(--sx); } .toggle.sx.active { background: var(--sx-bg); border-color: var(--sx); }
+.toggle.gc { color: var(--gc); } .toggle.gc.active { background: var(--gc-bg); border-color: var(--gc); }
+.toggle.wh { color: var(--wh); } .toggle.wh.active { background: var(--wh-bg); border-color: var(--wh); }
+.toggle .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: 0.4; }
+.toggle.active .dot { opacity: 1; }
+
+/* Controls */
+.controls { display: flex; gap: 10px; margin-left: auto; }
+.btn {
+    padding: 9px 22px; border: none; border-radius: 9px; font-size: 13px;
+    font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: all 0.15s; font-family: inherit;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #1e40af, #3b82f6); color: white;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626, #ef4444); color: white;
+    box-shadow: 0 2px 8px rgba(220,38,38,0.2);
+}
+
+/* Status bar */
+.status-bar {
+    display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    margin-bottom: 16px; box-shadow: var(--shadow);
+}
+.status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); }
+.status-dot.recording { background: #22c55e; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.status-text { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.mic-meter { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.mic-meter-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #3b82f6); border-radius: 3px; transition: width 0.1s; width: 0%; }
+
+/* Transcript grid */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+.transcript-card {
+    background: var(--surface); border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow); border: 1.5px solid var(--border);
+    display: flex; flex-direction: column; min-height: 280px;
+    transition: border-color 0.2s;
+}
+.transcript-card.dg { border-color: var(--dg-border); }
+.transcript-card.sx { border-color: var(--sx-border); }
+.transcript-card.gc { border-color: var(--gc-border); }
+.transcript-card.wh { border-color: var(--wh-border); }
+
+.transcript-card.dg.has-text { border-color: var(--dg); }
+.transcript-card.sx.has-text { border-color: var(--sx); }
+.transcript-card.gc.has-text { border-color: var(--gc); }
+.transcript-card.wh.has-text { border-color: var(--wh); }
+
+.card-header {
+    padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;
+}
+.card-header.dg { background: var(--dg-bg); border-bottom: 1px solid var(--dg-border); }
+.card-header.sx { background: var(--sx-bg); border-bottom: 1px solid var(--sx-border); }
+.card-header.gc { background: var(--gc-bg); border-bottom: 1px solid var(--gc-border); }
+.card-header.wh { background: var(--wh-bg); border-bottom: 1px solid var(--wh-border); }
+
+.card-header h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.card-header.dg h3 { color: var(--dg); }
+.card-header.sx h3 { color: var(--sx); }
+.card-header.gc h3 { color: var(--gc); }
+.card-header.wh h3 { color: var(--wh); }
+
+.card-header .word-count { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+.transcript-body {
+    flex: 1; padding: 16px 18px; overflow-y: auto;
+    direction: rtl; text-align: right;
+    font-family: 'Noto Nastaliq Urdu', serif; font-size: 16px; line-height: 2;
+    color: var(--text); min-height: 200px;
+}
+.transcript-body.empty {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-style: italic; direction: ltr;
+    text-align: center; font-family: 'Inter', sans-serif; font-size: 13px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="header-icon">🎙️</div>
+        <div>
+            <div class="header-title">Real-Time STT Comparison</div>
+            <div class="header-subtitle">Compare speech-to-text providers side by side</div>
+        </div>
+    </div>
+    <div class="provider-badges">
+        <span class="provider-badge" style="color:#93c5fd;">Deepgram Nova-3</span>
+        <span class="provider-badge" style="color:#f9a8d4;">Soniox</span>
+        <span class="provider-badge" style="color:#86efac;">Google Chirp</span>
+        <span class="provider-badge" style="color:#fcd34d;">Whisper API</span>
+    </div>
+</div>
+
+<div class="main">
+    <!-- Config -->
+    <div class="config-bar">
+        <div class="config-group">
+            <label>Language</label>
+            <select id="language">
+                <option value="Urdu">Urdu</option>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Malay">Malay</option>
+            </select>
+        </div>
+        <div class="config-group">
+            <label>Whisper Model</label>
+            <select id="whisperModel">
+                <option value="tiny">Tiny</option>
+                <option value="base" selected>Base</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+            </select>
+        </div>
+
+        <div class="toggle-group">
+            <div class="toggle dg active" id="tog-deepgram" onclick="toggleProvider(this, 'deepgram')">
+                <span class="dot"></span> Deepgram
+            </div>
+            <div class="toggle sx active" id="tog-soniox" onclick="toggleProvider(this, 'soniox')">
+                <span class="dot"></span> Soniox
+            </div>
+            <div class="toggle gc" id="tog-google" onclick="toggleProvider(this, 'google')">
+                <span class="dot"></span> Google
+            </div>
+            <div class="toggle wh active" id="tog-whisper" onclick="toggleProvider(this, 'whisper')">
+                <span class="dot"></span> Whisper
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="btnStart" onclick="startRecording()">
+                🎙️ Start Recording
+            </button>
+            <button class="btn btn-danger" id="btnStop" onclick="stopRecording()" style="display:none;">
+                ⏹ Stop
+            </button>
+        </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-text" id="statusText">Ready — Select providers and click Start</span>
+        <div class="mic-meter">
+            <div class="mic-meter-fill" id="micMeter"></div>
+        </div>
+    </div>
+
+    <!-- Transcript Grid -->
+    <div class="grid">
+        <div class="transcript-card dg" id="card-deepgram">
+            <div class="card-header dg">
+                <h3><span>●</span> Deepgram Nova-3</h3>
+                <span class="word-count" id="wc-deepgram">0 words</span>
+            </div>
+            <div class="transcript-body empty" id="text-deepgram">Waiting for audio...</div>
+        </div>
+        <div class="transcript-card sx" id="card-soniox">
+            <div class="card-header sx">
+                <h3><span>●</span> Soniox</h3>
+                <span class="word-count" id="wc-soniox">0 words</span>
+            </div>
+            <div class="transcript-body empty" id="text-soniox">Waiting for audio...</div>
+        </div>
+        <div class="transcript-card gc" id="card-google">
+            <div class="card-header gc">
+                <h3><span>●</span> Google Chirp 3</h3>
+                <span class="word-count" id="wc-google">0 words</span>
+            </div>
+            <div class="transcript-body empty" id="text-google">Waiting for audio...</div>
+        </div>
+        <div class="transcript-card wh" id="card-whisper">
+            <div class="card-header wh">
+                <h3><span>●</span> Whisper (API)</h3>
+                <span class="word-count" id="wc-whisper">0 words</span>
+            </div>
+            <div class="transcript-body empty" id="text-whisper">Waiting for audio...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+let ws = null;
+const providers = { deepgram: true, soniox: true, google: false, whisper: true };
+
+function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/ws`);
+    ws.onopen = () => console.log("WS connected");
+    ws.onclose = () => { console.log("WS closed"); setTimeout(connectWS, 2000); };
+    ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.type === "transcript") {
+            updateTranscript(msg.provider, msg.text);
+        } else if (msg.type === "status") {
+            setStatus(msg.status);
+        } else if (msg.type === "mic_rms") {
+            document.getElementById("micMeter").style.width = Math.min(msg.rms * 800, 100) + "%";
+        }
+    };
+}
+
+function updateTranscript(provider, text) {
+    const el = document.getElementById("text-" + provider);
+    const card = document.getElementById("card-" + provider);
+    const wc = document.getElementById("wc-" + provider);
+    if (text && !text.startsWith("[")) {
+        el.textContent = text;
+        el.classList.remove("empty");
+        card.classList.add("has-text");
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+        wc.textContent = words.length + " word" + (words.length !== 1 ? "s" : "");
+    } else if (text.startsWith("[")) {
+        el.textContent = text;
+        el.classList.add("empty");
+        el.style.direction = "ltr";
+        el.style.fontFamily = "'Inter', sans-serif";
+        el.style.fontSize = "13px";
+        el.style.color = "#ef4444";
+    }
+}
+
+function setStatus(status) {
+    const dot = document.getElementById("statusDot");
+    const text = document.getElementById("statusText");
+    const btnStart = document.getElementById("btnStart");
+    const btnStop = document.getElementById("btnStop");
+
+    if (status === "recording") {
+        dot.className = "status-dot recording";
+        text.textContent = "Recording...";
+        btnStart.style.display = "none";
+        btnStop.style.display = "flex";
+    } else {
+        dot.className = "status-dot";
+        text.textContent = "Stopped — Ready for next session";
+        btnStart.style.display = "flex";
+        btnStop.style.display = "none";
+    }
+}
+
+function toggleProvider(el, name) {
+    providers[name] = !providers[name];
+    el.classList.toggle("active", providers[name]);
+}
+
+function startRecording() {
+    // Clear previous text
+    ["deepgram","soniox","google","whisper"].forEach(p => {
+        const el = document.getElementById("text-" + p);
+        el.textContent = "Waiting for audio...";
+        el.classList.add("empty");
+        el.style.direction = "rtl";
+        el.style.fontFamily = "'Noto Nastaliq Urdu', serif";
+        el.style.fontSize = "16px";
+        el.style.color = "";
+        document.getElementById("card-" + p).classList.remove("has-text");
+        document.getElementById("wc-" + p).textContent = "0 words";
+    });
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            action: "start",
+            language: document.getElementById("language").value,
+            whisper_model: document.getElementById("whisperModel").value,
+            providers: providers,
+        }));
+    }
+}
+
+function stopRecording() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "stop" }));
+    }
+}
+
+connectWS();
+</script>
+</body>
+</html>
