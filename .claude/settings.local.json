@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//LISTEN/**)",
+      "Bash(xargs kill:*)"
+    ]
+  }
+}

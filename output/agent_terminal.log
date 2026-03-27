@@ -1,15 +1,23 @@
-=== Hospital Support Desk Agent Started at 2026-03-27 17:51:20 ===
+=== Hospital Support Desk Agent Started at 2026-03-27 18:51:57 ===
 
-2026-03-27 17:51:20,546 [INFO] agent: Disease clusters: Loaded 12 departments
-2026-03-27 17:51:20,547 [INFO] agent: DEEPGRAM_KEY set: True (len=40)
-2026-03-27 17:51:20,547 [INFO] agent: OPENAI_KEY set: True (len=164)
-2026-03-27 17:51:20,547 [INFO] agent: ELEVENLABS_KEY set: True (len=51)
-2026-03-27 17:51:20,547 [INFO] agent: ANTHROPIC_KEY set: False (len=0)
-2026-03-27 17:51:20.648 | INFO     | pipecat:<module>:14 - ᓚᘏᗢ Pipecat 0.0.85 (Python 3.10.0 (default, Mar  3 2022, 03:57:21) [Clang 12.0.0 ]) ᓚᘏᗢ
-2026-03-27 17:51:27,251 [INFO] agent: TTSCache: Loaded 47 cached entries
-2026-03-27 17:51:27,636 [INFO] agent: Agent: Initializing Hospital Support Desk Agent...
-2026-03-27 17:51:27,637 [INFO] agent: Session: Restored settings — agent=Hira, voice=nova, provider=OpenAI
-2026-03-27 17:51:27,638 [INFO] agent: Agent: Initialized
-2026-03-27 17:51:27,640 [INFO] agent: Loaded HTML template from /Users/AqibMumtaz/Aqib Mumtaz/BitLogix/BitLogix-ASR/R&D/AI-Clinical-Triage-System/templates/conversation_agent.html (117765 chars)
-2026-03-27 17:51:27,766 [INFO] agent: Starting City General Hospital Support Desk on port 7871
-2026-03-27 17:51:29,629 [INFO] agent: WS: Client connected (total: 1)
+2026-03-27 18:51:57,186 [INFO] agent: Disease clusters: Loaded 12 departments
+2026-03-27 18:51:57,186 [INFO] agent: DEEPGRAM_KEY set: False (len=0)
+2026-03-27 18:51:57,186 [INFO] agent: OPENAI_KEY set: False (len=0)
+2026-03-27 18:51:57,187 [INFO] agent: ELEVENLABS_KEY set: False (len=0)
+2026-03-27 18:51:57,187 [INFO] agent: ANTHROPIC_KEY set: False (len=0)
+2026-03-27 18:51:57.238 | INFO     | pipecat:<module>:14 - ᓚᘏᗢ Pipecat 0.0.85 (Python 3.10.18 (main, Jun  5 2025, 08:13:51) [Clang 14.0.6 ]) ᓚᘏᗢ
+2026-03-27 18:53:03.945 | ERROR    | pipecat.audio.vad.silero:<module>:29 - Exception: No module named 'onnxruntime'
+2026-03-27 18:53:03.945 | ERROR    | pipecat.audio.vad.silero:<module>:30 - In order to use Silero VAD, you need to `pip install pipecat-ai[silero]`.
+Traceback (most recent call last):
+  File "/Users/AqibMumtaz/anaconda3/envs/ai-clinical-triage/lib/python3.10/site-packages/pipecat/audio/vad/silero.py", line 26, in <module>
+    import onnxruntime
+ModuleNotFoundError: No module named 'onnxruntime'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/AqibMumtaz/Aqib Mumtaz/SL/AI-Clinical-Triage-System/conversation_agent.py", line 774, in <module>
+    from pipecat.audio.vad.silero import SileroVADAnalyzer
+  File "/Users/AqibMumtaz/anaconda3/envs/ai-clinical-triage/lib/python3.10/site-packages/pipecat/audio/vad/silero.py", line 31, in <module>
+    raise Exception(f"Missing module(s): {e}")
+Exception: Missing module(s): No module named 'onnxruntime'
