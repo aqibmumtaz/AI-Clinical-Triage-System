@@ -936,6 +936,26 @@ class TTSAudioCache:
             if os.path.exists(TTS_CACHE_INDEX):
                 with open(TTS_CACHE_INDEX, "r") as f:
                     self._index = json.load(f)
+                # Migrate flat files into language subdirectories
+                migrated = 0
+                for key, entry in list(self._index.items()):
+                    fname = entry.get("file", "")
+                    if "/" not in fname:
+                        # Flat file — detect language from text (Urdu chars → ur, else en)
+                        text = entry.get("text", "")
+                        lang = "ur" if any('\u0600' <= c <= '\u06FF' for c in text) else "en"
+                        lang_dir = os.path.join(TTS_CACHE_DIR, lang)
+                        os.makedirs(lang_dir, exist_ok=True)
+                        old_path = os.path.join(TTS_CACHE_DIR, fname)
+                        new_fname = f"{lang}/{fname}"
+                        new_path = os.path.join(TTS_CACHE_DIR, new_fname)
+                        if os.path.exists(old_path):
+                            os.rename(old_path, new_path)
+                            entry["file"] = new_fname
+                            migrated += 1
+                if migrated:
+                    logger.info(f"TTSCache: Migrated {migrated} files into language dirs")
+                    self._save_index()
                 # Validate: remove entries with missing/corrupt files
                 orphaned = []
                 for key, entry in list(self._index.items()):
@@ -989,7 +1009,7 @@ class TTSAudioCache:
             self._stats["misses"] += 1
             return None
 
-    def put(self, key, audio_bytes, sample_rate, channels, text, voice, provider, model):
+    def put(self, key, audio_bytes, sample_rate, channels, text, voice, provider, model, language="en"):
         """Store audio in cache. Rejects audio smaller than 5KB (likely corrupt/empty)."""
         if len(audio_bytes) < 5000:
             logger.warning(f"TTSCache: Rejecting tiny audio ({len(audio_bytes)} bytes) for '{text[:40]}'")
@@ -1004,10 +1024,11 @@ class TTSAudioCache:
                 pass
             del self._index[oldest_key]
 
-        filename = f"{key}.pcm"
+        lang_dir = os.path.join(TTS_CACHE_DIR, language)
+        filename = f"{language}/{key}.pcm"
         filepath = os.path.join(TTS_CACHE_DIR, filename)
         try:
-            os.makedirs(TTS_CACHE_DIR, exist_ok=True)
+            os.makedirs(lang_dir, exist_ok=True)
             with open(filepath, "wb") as f:
                 f.write(audio_bytes)
             self._index[key] = {
@@ -1220,7 +1241,8 @@ class TTSCacheCapture(FrameProcessor):
                     audio_bytes = b''.join(self._audio_chunks)
                     _tts_cache.put(
                         key, audio_bytes, self._sample_rate, self._channels,
-                        clean, self._agent.tts_voice, self._agent.tts_provider, self._agent.tts_model
+                        clean, self._agent.tts_voice, self._agent.tts_provider, self._agent.tts_model,
+                        self._agent.stt_language
                     )
                     logger.info(f"TTSCache SAVED: '{clean[:50]}...' ({len(audio_bytes)} bytes, {len(self._audio_chunks)} chunks)")
             self._capturing = False

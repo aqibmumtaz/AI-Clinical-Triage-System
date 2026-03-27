@@ -1834,16 +1834,8 @@ function updateFlowStepper(data) {
     const relevantVitals = getRelevantVitals(data.symptoms);
     const vitalLabel = document.getElementById("flowVitalLabel");
 
-    // Update vitals label — show relevant vital names or default "Vitals"
-    if (relevantVitals.length > 0 && steps.flowSymptoms) {
-        const vitalNames = relevantVitals.map(id => {
-            const el = document.getElementById(id);
-            return el ? el.closest(".screening-field").querySelector("label").textContent : "";
-        }).filter(Boolean);
-        vitalLabel.textContent = vitalNames.join(", ");
-    } else {
-        vitalLabel.textContent = "Vitals";
-    }
+    // Always show "Vitals" as the step label
+    vitalLabel.textContent = "Vitals";
 
     // Check if vital data collected
     const v = data.vitals || {};
