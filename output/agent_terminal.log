@@ -1,23 +1,79 @@
-=== Hospital Support Desk Agent Started at 2026-03-27 18:51:57 ===
+=== Hospital Support Desk Agent Started at 2026-03-27 19:30:02 ===
 
-2026-03-27 18:51:57,186 [INFO] agent: Disease clusters: Loaded 12 departments
-2026-03-27 18:51:57,186 [INFO] agent: DEEPGRAM_KEY set: False (len=0)
-2026-03-27 18:51:57,186 [INFO] agent: OPENAI_KEY set: False (len=0)
-2026-03-27 18:51:57,187 [INFO] agent: ELEVENLABS_KEY set: False (len=0)
-2026-03-27 18:51:57,187 [INFO] agent: ANTHROPIC_KEY set: False (len=0)
-2026-03-27 18:51:57.238 | INFO     | pipecat:<module>:14 - ᓚᘏᗢ Pipecat 0.0.85 (Python 3.10.18 (main, Jun  5 2025, 08:13:51) [Clang 14.0.6 ]) ᓚᘏᗢ
-2026-03-27 18:53:03.945 | ERROR    | pipecat.audio.vad.silero:<module>:29 - Exception: No module named 'onnxruntime'
-2026-03-27 18:53:03.945 | ERROR    | pipecat.audio.vad.silero:<module>:30 - In order to use Silero VAD, you need to `pip install pipecat-ai[silero]`.
-Traceback (most recent call last):
-  File "/Users/AqibMumtaz/anaconda3/envs/ai-clinical-triage/lib/python3.10/site-packages/pipecat/audio/vad/silero.py", line 26, in <module>
-    import onnxruntime
-ModuleNotFoundError: No module named 'onnxruntime'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/AqibMumtaz/Aqib Mumtaz/SL/AI-Clinical-Triage-System/conversation_agent.py", line 774, in <module>
-    from pipecat.audio.vad.silero import SileroVADAnalyzer
-  File "/Users/AqibMumtaz/anaconda3/envs/ai-clinical-triage/lib/python3.10/site-packages/pipecat/audio/vad/silero.py", line 31, in <module>
-    raise Exception(f"Missing module(s): {e}")
-Exception: Missing module(s): No module named 'onnxruntime'
+2026-03-27 19:30:02,218 [INFO] agent: Disease clusters: Loaded 12 departments
+2026-03-27 19:30:02,218 [INFO] agent: DEEPGRAM_KEY set: True (len=40)
+2026-03-27 19:30:02,218 [INFO] agent: OPENAI_KEY set: True (len=164)
+2026-03-27 19:30:02,218 [INFO] agent: ELEVENLABS_KEY set: True (len=51)
+2026-03-27 19:30:02,218 [INFO] agent: ANTHROPIC_KEY set: False (len=0)
+2026-03-27 19:30:02.273 | INFO     | pipecat:<module>:14 - ᓚᘏᗢ Pipecat 0.0.85 (Python 3.10.18 (main, Jun  5 2025, 08:13:51) [Clang 14.0.6 ]) ᓚᘏᗢ
+2026-03-27 19:30:06,860 [INFO] agent: TTSCache: Loaded 47 cached entries
+2026-03-27 19:30:07,120 [INFO] agent: Agent: Initializing Hospital Support Desk Agent...
+2026-03-27 19:30:07,120 [INFO] agent: Session: Restored settings — agent=Hira, voice=nova, provider=OpenAI
+2026-03-27 19:30:07,142 [INFO] agent: Agent: Initialized
+2026-03-27 19:30:07,165 [INFO] agent: Loaded HTML template from /Users/AqibMumtaz/Aqib Mumtaz/SL/AI-Clinical-Triage-System/templates/conversation_agent.html (117765 chars)
+2026-03-27 19:30:07,514 [INFO] agent: Starting City General Hospital Support Desk on port 7871
+2026-03-27 19:51:02,271 [INFO] agent: WS: Client connected (total: 1)
+2026-03-27 19:51:04,919 [INFO] agent: WS: Client disconnected (total: 0)
+2026-03-27 19:51:05,043 [INFO] agent: WS: Client connected (total: 1)
+2026-03-27 19:51:06,740 [INFO] agent: WS: Batch settings updated (10 keys)
+2026-03-27 19:51:06.956 | DEBUG    | pipecat.transports.smallwebrtc.connection:_initialize:234 - Initializing new peer connection
+2026-03-27 19:51:06.967 | DEBUG    | pipecat.transports.smallwebrtc.connection:_create_answer:320 - Creating answer
+2026-03-27 19:51:06.968 | DEBUG    | pipecat.transports.smallwebrtc.connection:on_track:302 - Track audio received
+2026-03-27 19:51:06.970 | DEBUG    | pipecat.transports.smallwebrtc.connection:on_icegatheringstatechange:298 - ICE gathering state is gathering
+2026-03-27 19:51:11.973 | DEBUG    | pipecat.transports.smallwebrtc.connection:on_icegatheringstatechange:298 - ICE gathering state is complete
+2026-03-27 19:51:11.974 | DEBUG    | pipecat.transports.smallwebrtc.connection:_create_answer:323 - Setting the answer after the local description is created
+2026-03-27 19:51:11,974 [INFO] agent: WebRTC: Answer generated
+2026-03-27 19:51:11.978 | ERROR    | pipecat.audio.filters.krisp_filter:<module>:24 - Exception: No module named 'pipecat_ai_krisp'
+2026-03-27 19:51:11.979 | ERROR    | pipecat.audio.filters.krisp_filter:<module>:25 - In order to use the Krisp filter, you need to `pip install pipecat-ai[krisp]`.
+2026-03-27 19:51:11,979 [INFO] agent: Audio filter: None (Krisp not available) — interruptions DISABLED to handle background noise
+2026-03-27 19:51:11.979 | DEBUG    | pipecat.audio.vad.silero:__init__:147 - Loading Silero VAD model...
+2026-03-27 19:51:12.273 | DEBUG    | pipecat.audio.vad.silero:__init__:169 - Loaded Silero VAD
+2026-03-27 19:51:12,274 [INFO] agent: STT: Using Deepgram Nova-3 language=en (confidence filter=0.45)
+2026-03-27 19:51:12,369 [INFO] agent: TTS: Using OpenAI model=tts-1 voice=nova
+2026-03-27 19:51:12.415 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking Pipeline#0::Source -> SmallWebRTCInputTransport#0
+2026-03-27 19:51:12.415 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking SmallWebRTCInputTransport#0 -> AudioLevelMonitor#0
+2026-03-27 19:51:12.415 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking AudioLevelMonitor#0 -> ConfidenceFilteredDeepgramSTT#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking ConfidenceFilteredDeepgramSTT#0 -> STTBroadcaster#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking STTBroadcaster#0 -> UserIdleProcessor#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking UserIdleProcessor#0 -> OpenAIUserContextAggregator#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking OpenAIUserContextAggregator#0 -> OpenAILLMService#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking OpenAILLMService#0 -> ResponseBroadcaster#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking ResponseBroadcaster#0 -> TTSCacheGate#0
+2026-03-27 19:51:12.416 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking TTSCacheGate#0 -> OpenAITTSService#0
+2026-03-27 19:51:12.417 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking OpenAITTSService#0 -> TTSCacheCapture#0
+2026-03-27 19:51:12.417 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking TTSCacheCapture#0 -> OpenAIAssistantContextAggregator#0
+2026-03-27 19:51:12.417 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking OpenAIAssistantContextAggregator#0 -> SmallWebRTCOutputTransport#0
+2026-03-27 19:51:12.417 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking SmallWebRTCOutputTransport#0 -> Pipeline#0::Sink
+2026-03-27 19:51:12.418 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking PipelineTask#0::Source -> Pipeline#0
+2026-03-27 19:51:12.418 | DEBUG    | pipecat.processors.frame_processor:link:509 - Linking Pipeline#0 -> PipelineTask#0::Sink
+2026-03-27 19:51:12,418 [INFO] agent: Agent: Patient #1 pipeline started
+2026-03-27 19:51:12.418 | DEBUG    | pipecat.pipeline.runner:run:71 - Runner PipelineRunner#0 started running PipelineTask#0
+2026-03-27 19:51:12.419 | DEBUG    | pipecat.pipeline.task:_wait_for_pipeline_start:517 - PipelineTask#0: Starting. Waiting for StartFrame#0 to reach the end of the pipeline...
+2026-03-27 19:51:12.420 | DEBUG    | pipecat.transports.smallwebrtc.connection:on_iceconnectionstatechange:292 - ICE connection state is checking, connection is connecting
+2026-03-27 19:51:12.421 | DEBUG    | pipecat.transports.smallwebrtc.connection:_handle_new_connection_state:485 - Connection state changed to: connecting
+2026-03-27 19:51:12.422 | DEBUG    | pipecat.audio.vad.vad_analyzer:set_params:150 - Setting VAD params to: confidence=0.6 start_secs=0.2 stop_secs=0.6 min_volume=0.5
+2026-03-27 19:51:12.423 | INFO     | pipecat.transports.smallwebrtc.transport:connect:421 - Connecting to Small WebRTC
+2026-03-27 19:51:12.424 | DEBUG    | pipecat.services.deepgram.stt:_connect:216 - Connecting to Deepgram
+2026-03-27 19:51:12.487 | DEBUG    | pipecat.transports.smallwebrtc.connection:on_iceconnectionstatechange:292 - ICE connection state is completed, connection is connecting
+2026-03-27 19:51:12.491 | DEBUG    | pipecat.transports.smallwebrtc.connection:_handle_new_connection_state:485 - Connection state changed to: connected
+2026-03-27 19:51:12.493 | DEBUG    | pipecat.transports.smallwebrtc.transport:on_connected:242 - Peer connection established.
+2026-03-27 19:51:12.493 | WARNING  | pipecat.transports.smallwebrtc.connection:video_input_track:548 - No video transceiver is available
+2026-03-27 19:51:12.494 | WARNING  | pipecat.transports.smallwebrtc.connection:screen_video_input_track:570 - No screen video transceiver is available
+2026-03-27 19:51:12.494 | DEBUG    | pipecat.transports.smallwebrtc.connection:replace_audio_track:408 - Replacing audio track audio
+2026-03-27 19:51:12,495 [INFO] agent: WebRTC: Client connected, patient #1
+<string>:4: DeprecationWarning: LLMMessagesFrame is deprecated and will be removed in a future version. Instead, use either `LLMMessagesUpdateFrame` with `run_llm=True`, or `OpenAILLMContextFrame` with desired messages in a new context
+2026-03-27 19:51:14.597 | DEBUG    | pipecat.pipeline.task:_wait_for_pipeline_start:520 - PipelineTask#0: StartFrame#0 reached the end of the pipeline, pipeline is now ready.
+2026-03-27 19:51:14.604 | DEBUG    | pipecat.services.openai.base_llm:_stream_chat_completions_specific_context:275 - OpenAILLMService#0: Generating chat from LLM-specific context [{'role': 'user', 'content': '(A new patient has arrived. Say welcome to City General Hospital, mention the hospital name, and ask their name.)'}]
+2026-03-27 19:51:21.407 | DEBUG    | pipecat.processors.metrics.frame_processor_metrics:stop_ttfb_metrics:131 - OpenAILLMService#0 TTFB: 6.802944898605347
+2026-03-27 19:51:21.920 | DEBUG    | pipecat.processors.metrics.frame_processor_metrics:stop_processing_metrics:152 - OpenAILLMService#0 processing time: 7.316096067428589
+2026-03-27 19:51:21,921 [INFO] agent: Agent replied: 'Welcome to City General Hospital! We're glad you're here. May I have your name, please?'
+2026-03-27 19:51:22.001 | DEBUG    | pipecat.services.openai.tts:run_tts:135 - OpenAITTSService#0: Generating TTS [Welcome to City General Hospital!]
+2026-03-27 19:51:23.945 | DEBUG    | pipecat.processors.metrics.frame_processor_metrics:stop_ttfb_metrics:131 - OpenAITTSService#0 TTFB: 1.9434330463409424
+2026-03-27 19:51:23.947 | DEBUG    | pipecat.transports.base_output:_bot_started_speaking:600 - Bot started speaking
+2026-03-27 19:51:24.430 | DEBUG    | pipecat.processors.metrics.frame_processor_metrics:stop_processing_metrics:152 - OpenAITTSService#0 processing time: 2.4288790225982666
+2026-03-27 19:51:24.431 | DEBUG    | pipecat.services.openai.tts:run_tts:135 - OpenAITTSService#0: Generating TTS [ We're glad you're here.]
+2026-03-27 19:51:26.138 | DEBUG    | pipecat.transports.base_output:_bot_stopped_speaking:616 - Bot stopped speaking
+2026-03-27 19:51:27.204 | DEBUG    | pipecat.processors.metrics.frame_processor_metrics:stop_ttfb_metrics:131 - OpenAITTSService#0 TTFB: 2.7735681533813477
+2026-03-27 19:51:27.206 | DEBUG    | pipecat.transports.base_output:_bot_started_speaking:600 - Bot started speaking
+2026-03-27 19:51:27.446 | DEBUG    | pipecat.processors.metrics.frame_processor_metrics:stop_processing_metrics:152 - OpenAITTSService#0 processing time: 3.015385866165161
+2026-03-27 19:51:27.447 | DEBUG    | pipecat.services.openai.tts:run_tts:135 - OpenAITTSService#0: Generating TTS [ May I have your name, please?]
