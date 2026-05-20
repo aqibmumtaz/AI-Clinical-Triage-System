@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:7871)",
+      "mcp__claude_ai_Hugging_Face__hub_repo_search",
+      "Bash(ls training_data/)",
+      "Bash(ls transcribe_recordings.py prepare_training_data.py)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
+    ],
+    "additionalDirectories": [
+      "/Users/AqibMumtaz/Aqib Mumtaz/SL"
+    ]
+  }
+}

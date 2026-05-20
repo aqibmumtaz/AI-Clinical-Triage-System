@@ -13,20 +13,25 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 CSS = """
 @page { size: A4; margin: 2cm; }
-body { font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1a1a2e; }
+html, body { background: #ffffff !important; }
+body { font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1a1a2e; background: #ffffff; }
 h1 { color: #1a1a2e; font-size: 22pt; border-bottom: 2px solid #6366f1; padding-bottom: 6px; margin-top: 24px; }
 h2 { color: #2d2d5e; font-size: 16pt; margin-top: 20px; }
 h3 { color: #4338ca; font-size: 13pt; margin-top: 16px; }
-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 10pt; }
-th { background: #6366f1; color: white; padding: 8px 10px; text-align: left; }
-td { padding: 6px 10px; border-bottom: 1px solid #e0e0e0; }
-tr:nth-child(even) td { background: #f8f8fc; }
-code { background: #f0f0f5; padding: 2px 5px; border-radius: 3px; font-size: 9pt; }
-pre { background: #f5f5fa; color: #1a1a2e; padding: 12px; border-radius: 6px; font-size: 9pt; overflow-x: auto; border: 1px solid #e0e0e0; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 10pt; background: #ffffff; }
+th { background: #6366f1 !important; color: white !important; padding: 8px 10px; text-align: left; }
+td { padding: 6px 10px; border-bottom: 1px solid #e0e0e0; background: #ffffff; color: #1a1a2e; }
+tr:nth-child(even) td { background: #f8f8fc !important; }
+tr:nth-child(odd) td { background: #ffffff !important; }
+code { background-color: #f0f0f5 !important; color: #1a1a2e !important; padding: 2px 5px; border-radius: 3px; font-size: 9pt; }
+pre { background-color: #f5f5fa !important; color: #1a1a2e !important; padding: 12px; border-radius: 6px; font-size: 9pt; overflow-x: auto; border: 1px solid #e0e0e0; }
+pre code { background-color: #f5f5fa !important; color: #1a1a2e !important; padding: 0; }
+pre *, code * { background-color: inherit !important; color: inherit !important; }
 hr { border: none; border-top: 1px solid #d0d0d0; margin: 20px 0; }
-blockquote { border-left: 4px solid #6366f1; padding-left: 12px; color: #555; }
+blockquote { border-left: 4px solid #6366f1; padding-left: 12px; color: #555; background: #ffffff; }
 strong { color: #1a1a2e; }
 a { color: #6366f1; }
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 """
 
 # Color palette
@@ -48,7 +53,10 @@ def md_to_pdf(md_path, pdf_path):
     with open(md_path, "r") as f:
         md_text = f.read()
     html_body = markdown.markdown(md_text, extensions=["tables", "fenced_code", "nl2br"])
-    full_html = f"<html><head><style>{CSS}</style></head><body>{html_body}</body></html>"
+    # Strip any inline dark styles/classes that markdown might add
+    html_body = html_body.replace('class="codehilite"', '')
+    html_body = html_body.replace('class="highlight"', '')
+    full_html = f"""<html><head><style>{CSS}</style></head><body style="background:#ffffff;color:#1a1a2e;">{html_body}</body></html>"""
     HTML(string=full_html).write_pdf(pdf_path)
     print(f"PDF: {pdf_path} ({os.path.getsize(pdf_path)//1024}KB)")
 
