@@ -224,6 +224,40 @@ R&D/AI-Clinical-Triage-System/
 | POST | `/api/offer` | WebRTC SDP offer/answer exchange |
 | WS | `/ws` | UI state, settings, conversation, triage scores |
 
+## Pricing
+
+Per-minute pricing in USD and PKR (USD × 280). Source: `templates/conversation_agent.html` PRICING table. Monthly figures: 9,600 min (8h × 5d × 4w) and 40,320 min (24 × 7 × 4w). Assumes ~1000 chars/min of speech for TTS.
+
+### Per-component pricing
+
+| Component | Model | $/min | ₨/min | 8h×5d/mo (₨) | 24×7/mo (₨) |
+|---|---|---:|---:|---:|---:|
+| **STT** | Deepgram Nova-3 | 0.00770 | 2.16 | 20,698 | 86,932 |
+| **STT** | OpenAI Realtime | 0.00600 | 1.68 | 16,128 | 67,738 |
+| **LLM** | gpt-4o-mini | 0.00015 | 0.04 | 403 | 1,693 |
+| **LLM** | gpt-3.5-turbo | 0.00050 | 0.14 | 1,344 | 5,645 |
+| **LLM** | gpt-4o | 0.00250 | 0.70 | 6,720 | 28,224 |
+| **LLM** | gpt-4-turbo | 0.01000 | 2.80 | 26,880 | 112,896 |
+| **LLM** | claude-haiku-4-5 | 0.00100 | 0.28 | 2,688 | 11,290 |
+| **LLM** | claude-sonnet-4-6 | 0.00300 | 0.84 | 8,064 | 33,869 |
+| **TTS** | OpenAI TTS-1 | 0.01500 | 4.20 | 40,320 | 169,344 |
+| **TTS** | OpenAI TTS-1-HD | 0.03000 | 8.40 | 80,640 | 338,688 |
+| **TTS** | ElevenLabs Flash v2.5 | 0.06000 | 16.80 | 161,280 | 677,376 |
+| **TTS** | ElevenLabs Turbo v2.5 | 0.06000 | 16.80 | 161,280 | 677,376 |
+| **TTS** | ElevenLabs Multi v2 | 0.12000 | 33.60 | 322,560 | 1,354,752 |
+
+### Combined stacks (Deepgram + gpt-4o-mini + TTS)
+
+| Stack | $/min | ₨/min | 8h×5d/mo (₨) | 24×7/mo (₨) |
+|---|---:|---:|---:|---:|
+| Deepgram + 4o-mini + TTS-1 | 0.02285 | 6.40 | 61,421 | 257,966 |
+| Deepgram + 4o-mini + TTS-1-HD ⭐ *current* | 0.03785 | 10.60 | 101,741 | 427,310 |
+| Deepgram + 4o-mini + EL Flash v2.5 | 0.06785 | 19.00 | 182,381 | 765,997 |
+| Deepgram + 4o-mini + EL Turbo v2.5 | 0.06785 | 19.00 | 182,381 | 765,997 |
+| Deepgram + 4o-mini + EL Multi v2 | 0.12785 | 35.80 | 343,661 | 1,443,373 |
+
+> TTS audio caching (~85% hit rate, see "Conversation Agent" features) reduces TTS spend by ~85% in steady state.
+
 ## License
 
 Proprietary. All rights reserved. Aqib Mumtaz.
